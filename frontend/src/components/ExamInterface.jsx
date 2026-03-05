@@ -12,31 +12,22 @@ const ExamInterface = ({ user, topic, onComplete }) => {
   const [examFinished, setExamFinished] = useState(false);
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const res = await fetch(`/api/exam/questions?topic=${topic}`);
-        if (!res.ok) throw new Error('Failed to fetch questions');
-        const data = await res.json();
-        
-        // Ensure options match ExamInterface expectations
-        const mappedData = data.map(q => ({
-          ...q,
-          correctOption: q.correctOption === q.optionA ? 'A' : q.correctOption === q.optionB ? 'B' : q.correctOption === q.optionC ? 'C' : 'D'
-        }));
-        
-        setQuestions(mappedData);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuestions();
+    // Load from local questionBank since backend isn't running
+    const data = questionBank[topic] || [];
+    
+    // Use correctOption directly as it's already 'A', 'B', 'C', or 'D' in the local questionBank
+    const mappedData = data.map(q => ({
+      ...q,
+      correctOption: q.correctOption
+    }));
+    
+    setQuestions(mappedData);
+    setLoading(false);
   }, [topic]);
 
   const allAnswered = questions.length > 0 && Object.keys(submitted).length === questions.length;
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!selectedOption) return;
     const q = questions[currentIndex];
     const isCorrect = q.correctOption === selectedOption;
@@ -45,20 +36,7 @@ const ExamInterface = ({ user, topic, onComplete }) => {
     setSubmitted(prev => ({ ...prev, [currentIndex]: selectedOption }));
     if (isCorrect) setScore(prev => prev + 1);
 
-    // Save to backend instead of localStorage
-    try {
-      await fetch('/api/exam/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentId: user.id,
-          questionId: q.id,
-          selectedOption
-        })
-      });
-    } catch (err) {
-      console.error('Failed to submit to backend:', err);
-    }
+    // Skip backend submission, results are already handled via localStorage during handleFinish
 
     // Auto-move to next unanswered question after 1.2 seconds (but don't finish exam)
     setTimeout(() => {
@@ -82,6 +60,11 @@ const ExamInterface = ({ user, topic, onComplete }) => {
   };
 
   const handleFinish = () => {
+    if (!allAnswered) {
+      if (!window.confirm(`You have only answered ${Object.keys(submitted).length} out of ${questions.length} questions. Are you sure you want to finish now?`)) {
+        return;
+      }
+    }
     // Save final score to leaderboard
     const finalScore = score;
     const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
@@ -93,6 +76,20 @@ const ExamInterface = ({ user, topic, onComplete }) => {
     }
     localStorage.setItem('leaderboard', JSON.stringify(scores));
     setExamFinished(true);
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      setFeedback(null);
+      setSelectedOption(submitted[currentIndex - 1] || null);
+    }
+  };
+
+  const handleExit = () => {
+    if (window.confirm("Are you sure you want to exit? Your current exam progress will be lost.")) {
+      onComplete();
+    }
   };
 
   // ── Finished Screen: Score + Leaderboard ──
@@ -234,19 +231,28 @@ const ExamInterface = ({ user, topic, onComplete }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ width: '12px', height: '12px', borderRadius: '4px', background: '#6366f1', display: 'inline-block' }} /> Current</div>
         </div>
 
-        {/* FINISH EXAM BUTTON — shown only when all questions answered */}
-        {allAnswered && (
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <button onClick={handleFinish}
             style={{
-              marginTop: 'auto', padding: '16px', borderRadius: '12px', border: 'none',
-              background: 'linear-gradient(135deg, #22c55e, #10b981)', color: '#fff',
-              fontSize: '16px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s',
-              animation: 'pulse 1.5s infinite', letterSpacing: '1px'
+              padding: '14px', borderRadius: '12px', border: 'none',
+              background: allAnswered ? 'linear-gradient(135deg, #22c55e, #10b981)' : '#334155', 
+              color: '#fff', fontSize: '14px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s',
+              boxShadow: allAnswered ? '0 4px 12px rgba(34,197,94,0.3)' : 'none'
             }}
           >
-            ✅ Finish Exam
+            {allAnswered ? '✅ Finish Exam' : '🏁 Finish Early'}
           </button>
-        )}
+          
+          <button onClick={handleExit}
+            style={{
+              padding: '12px', borderRadius: '10px', border: '1px solid #475569',
+              background: 'transparent', color: '#94a3b8', fontSize: '13px', 
+              fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+            }}
+          >
+            🚪 Exit Exam
+          </button>
+        </div>
         <style>{`@keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { transform: scale(1.03); box-shadow: 0 0 20px 4px rgba(34,197,94,0.25); } }`}</style>
       </div>
 
@@ -307,19 +313,53 @@ const ExamInterface = ({ user, topic, onComplete }) => {
             </div>
           )}
 
-          {/* Submit Button — only if this question hasn't been answered yet */}
-          {!feedback && submitted[currentIndex] === undefined && (
-            <button onClick={handleSubmit} disabled={!selectedOption}
+          {/* Navigation Buttons */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+            <button onClick={handlePrevious} disabled={currentIndex === 0}
               style={{
-                marginTop: '24px', width: '100%', padding: '16px', borderRadius: '12px', border: 'none',
-                background: selectedOption ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : '#334155',
-                color: '#fff', fontSize: '16px', fontWeight: '700', transition: 'all 0.2s',
-                opacity: selectedOption ? 1 : 0.5
+                flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #475569',
+                background: 'rgba(30, 41, 59, 0.5)', color: currentIndex === 0 ? '#475569' : '#e2e8f0',
+                fontSize: '16px', fontWeight: '600', transition: 'all 0.2s',
+                cursor: currentIndex === 0 ? 'default' : 'pointer',
+                opacity: currentIndex === 0 ? 0.5 : 1
               }}
             >
-              Submit & Next →
+              ← Previous
             </button>
-          )}
+
+            {!feedback && submitted[currentIndex] === undefined ? (
+              <button onClick={handleSubmit} disabled={!selectedOption}
+                style={{
+                  flex: 2, padding: '16px', borderRadius: '12px', border: 'none',
+                  background: selectedOption ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : '#334155',
+                  color: '#fff', fontSize: '16px', fontWeight: '700', transition: 'all 0.2s',
+                  opacity: selectedOption ? 1 : 0.5, cursor: selectedOption ? 'pointer' : 'default'
+                }}
+              >
+                Submit & Next →
+              </button>
+            ) : (
+              <button onClick={() => {
+                  let next = currentIndex + 1;
+                  if (next < questions.length) {
+                    setCurrentIndex(next);
+                    setSelectedOption(submitted[next] || null);
+                    setFeedback(null);
+                  }
+                }}
+                disabled={currentIndex === questions.length - 1}
+                style={{
+                  flex: 2, padding: '16px', borderRadius: '12px', border: 'none',
+                  background: currentIndex === questions.length - 1 ? '#334155' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  color: '#fff', fontSize: '16px', fontWeight: '700', transition: 'all 0.2s',
+                  cursor: currentIndex === questions.length - 1 ? 'default' : 'pointer',
+                  opacity: currentIndex === questions.length - 1 ? 0.5 : 1
+                }}
+              >
+                Next Question →
+              </button>
+            )}
+          </div>
 
           {/* Already answered indicator */}
           {submitted[currentIndex] !== undefined && !feedback && (

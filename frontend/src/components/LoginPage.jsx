@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import emailjs from '@emailjs/browser';
 
 const LoginPage = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -25,13 +26,41 @@ const LoginPage = ({ onLogin }) => {
     { id: 2, name: 'Student One',  email: 'student1@exam.com', password: 'student1', role: 'STUDENT' },
   ];
 
+  // ── Notification: Send email to admin using EmailJS ──────────────────
+  const notifyAdmin = (userAction, userData) => {
+    // NOTE: These are placeholder IDs. User needs to replace them with their own EmailJS account details.
+    const SERVICE_ID = 'service_default'; 
+    const TEMPLATE_ID = 'template_login_alert';
+    const PUBLIC_KEY = 'YOUR_PUBLIC_KEY'; // User must provide this
+
+    const templateParams = {
+      admin_email: 'vijayapandian112007@gmail.com',
+      user_name: userData.name,
+      user_email: userData.email,
+      action: userAction,
+      timestamp: new Date().toLocaleString()
+    };
+
+    if (PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+      console.log(`[Notification Simulation] To: Admin, Action: ${userAction}, User: ${userData.name} (${userData.email})`);
+      return;
+    }
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+      .then(() => console.log('Admin notified successfully'))
+      .catch((err) => console.error('Failed to notify admin:', err));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
     // ── Admin bypass ───────────────────────────────────────────────────
-    if (!isRegister && email === 'admin@exam.com' && password === 'admin') {
-      onLogin({ id: 0, name: 'Admin', email: 'admin@exam.com', role: 'ADMIN' });
+    const ADMIN_EMAIL = 'vijayapandian112007@gmail.com';
+    if (!isRegister && email.toLowerCase() === ADMIN_EMAIL && password === 'admin') {
+      const adminUser = { id: 0, name: 'Vijayapandian (Admin)', email: ADMIN_EMAIL, role: 'ADMIN' };
+      notifyAdmin('Admin Login', adminUser);
+      onLogin(adminUser);
       return;
     }
 
@@ -48,9 +77,12 @@ const LoginPage = ({ onLogin }) => {
         return;
       }
 
-      const newUser = { id: Date.now(), name: name.trim(), email: email.trim().toLowerCase(), password, role: 'STUDENT' };
+      // If registered email is the admin email, assign ADMIN role, otherwise STUDENT
+      const role = email.toLowerCase() === ADMIN_EMAIL ? 'ADMIN' : 'STUDENT';
+      const newUser = { id: Date.now(), name: name.trim(), email: email.trim().toLowerCase(), password, role };
       saveUser(newUser);
       const { password: _p, ...safeUser } = newUser;
+      notifyAdmin('New Account Registration', safeUser);
       onLogin(safeUser);
 
     } else {
@@ -61,6 +93,7 @@ const LoginPage = ({ onLogin }) => {
       );
       if (found) {
         const { password: _p, ...safeUser } = found;
+        notifyAdmin('User Login', safeUser);
         onLogin(safeUser);
         return;
       }
@@ -154,10 +187,10 @@ const LoginPage = ({ onLogin }) => {
 
         <div style={{ marginTop: '20px', padding: '12px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.06)', border: '1px solid rgba(99, 102, 241, 0.1)', textAlign: 'center' }}>
           <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '2px' }}>Admin Access</p>
-          <p style={{ fontSize: '12px', color: '#818cf8', fontWeight: '600', marginBottom: '8px' }}>admin@exam.com / admin</p>
+          <p style={{ fontSize: '11px', color: '#818cf8', fontWeight: '600', marginBottom: '8px' }}>vijayapandian112007@gmail.com</p>
           <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '2px' }}>Student Access</p>
-          <p style={{ fontSize: '12px', color: '#34d399', fontWeight: '600', marginBottom: '2px' }}>demo@exam.com / demo</p>
-          <p style={{ fontSize: '11px', color: '#64748b' }}>or register a new account above</p>
+          <p style={{ fontSize: '11px', color: '#34d399', fontWeight: '600', marginBottom: '2px' }}>demo@exam.com / demo</p>
+          <p style={{ fontSize: '11px', color: '#64748b' }}>Register your own account to start testing</p>
         </div>
       </div>
     </div>
