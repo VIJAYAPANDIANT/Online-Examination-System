@@ -69,6 +69,12 @@ function App() {
     navigate('results');
   };
 
+  const handleExitExam = () => {
+    if (window.confirm("Are you sure you want to exit? Your current exam progress will be lost.")) {
+      navigate('topics');
+    }
+  };
+
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('exam_auth_user');
@@ -85,7 +91,7 @@ function App() {
     <div>
       {page === 'login' && <LoginPage onLogin={handleLogin} />}
       {page === 'topics' && <TopicSelection user={user} onSelect={handleTopicSelect} onLogout={handleLogout} />}
-      {page === 'exam' && <ExamInterface user={user} topic={selectedTopic} onComplete={handleExamComplete} />}
+      {page === 'exam' && <ExamInterface user={user} topic={selectedTopic} onComplete={handleExamComplete} onExit={() => navigate('topics')} />}
       {page === 'results' && <ResultScreen user={user} onBack={() => navigate('topics')} onLogout={handleLogout} />}
       {page === 'admin' && <AdminDashboard user={user} onLogout={handleLogout} />}
     </div>
