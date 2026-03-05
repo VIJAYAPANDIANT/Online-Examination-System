@@ -49,7 +49,7 @@ public class SubmitController {
 
         // Save to Redis first for speed
         String redisKey = "session:" + session.getId() + ":question:" + answer.getQuestionId();
-        redisTemplate.opsForValue().set(redisKey, answer.getSelectedOption());
+        redisTemplate.opsForValue().set(redisKey, String.valueOf(answer.getSelectedOption()));
 
         // Send to queue for async database saving
         producerService.queueSubmission(answer);

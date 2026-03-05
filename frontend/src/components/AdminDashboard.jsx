@@ -1,134 +1,147 @@
-import React, { useEffect, useState } from 'react';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const AdminDashboard = () => {
-  const [alerts, setAlerts] = useState([]);
-  const [activeSessions, setActiveSessions] = useState(0);
+const AdminDashboard = ({ user, onLogout }) => {
+  const [tab, setTab] = useState('students');
+  const [students, setStudents] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [newQ, setNewQ] = useState({ questionText: '', optionA: '', optionB: '', optionC: '', optionD: '', correctOption: 'A', topicCategory: 'JAVA' });
 
   useEffect(() => {
-    // 1. Initialize STOMP client over SockJS
-    const stompClient = new Client({
-      // Match the Spring Boot server port
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws-admin'),
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
-
-    stompClient.onConnect = (frame) => {
-      console.log('Connected to Admin WebSocket: ' + frame);
-
-      // 2. Subscribe to the topics we exposed in ProctorService
-      stompClient.subscribe('/topic/admin-alerts', (message) => {
-        // When a new violation occurs, it pushes here
-        const newAlert = message.body;
-        setAlerts((prev) => [
-          { id: Date.now(), text: newAlert, time: new Date().toLocaleTimeString() },
-          ...prev
-        ]);
-      });
-
-      // (Optional) Subscribe to a general stats topic
-      stompClient.subscribe('/topic/active-sessions', (message) => {
-        setActiveSessions(parseInt(message.body, 10));
-      });
-    };
-
-    stompClient.onStompError = (frame) => {
-      console.error('Broker reported error: ' + frame.headers['message']);
-      console.error('Additional details: ' + frame.body);
-    };
-
-    // 3. Connect
-    stompClient.activate();
-
-    // 4. Cleanup
-    return () => {
-      stompClient.deactivate();
-    };
+    fetchData();
   }, []);
 
+  const fetchData = async () => {
+    try {
+      const res1 = await axios.get('/api/admin/results');
+      setStudents(res1.data);
+      const res2 = await axios.get('/api/admin/leaderboard');
+      setLeaderboard(res2.data);
+    } catch {
+      // Mock data
+      setStudents([
+        { studentId: 1, name: 'John', email: 'john@test.com', score: 8, totalAttempted: 10 },
+        { studentId: 2, name: 'Alice', email: 'alice@test.com', score: 9, totalAttempted: 10 },
+      ]);
+      setLeaderboard([
+        { studentId: 2, name: 'Alice', score: 9 },
+        { studentId: 1, name: 'John', score: 8 },
+      ]);
+    }
+  };
+
+  const handleAddQuestion = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/admin/questions', newQ);
+      alert('Question added!');
+      setNewQ({ questionText: '', optionA: '', optionB: '', optionC: '', optionD: '', correctOption: 'A', topicCategory: 'JAVA' });
+    } catch { alert('Failed to add question'); }
+  };
+
+  const handleDelete = async (id) => {
+    try { await axios.delete(`/api/admin/students/${id}`); fetchData(); } catch { alert('Failed'); }
+  };
+
+  const inputStyle = { width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#e2e8f0', fontSize: '14px', marginBottom: '12px' };
+  const tabBtn = (t, label) => (
+    <button onClick={() => setTab(t)} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: tab === t ? '#6366f1' : '#1e293b', color: '#fff', fontWeight: '600', fontSize: '14px' }}>{label}</button>
+  );
+
   return (
-    <div style={{ backgroundColor: '#1a1d20', minHeight: '100vh', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
-      
-      {/* Top Navbar */}
-      <div style={{ padding: '20px 40px', backgroundColor: '#212529', borderBottom: '1px solid #343a40', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ color: '#dc3545' }}>⚡</span> War Room Dashboard
-        </h1>
-        <div style={{ display: 'flex', gap: '20px' }}>
-          <div style={{ backgroundColor: '#2c3034', padding: '10px 20px', borderRadius: '8px' }}>
-            <span style={{ color: '#adb5bd', fontSize: '14px' }}>Active Exams</span>
-            <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{activeSessions || 1}</div>
-          </div>
-          <div style={{ backgroundColor: '#2c3034', padding: '10px 20px', borderRadius: '8px' }}>
-            <span style={{ color: '#adb5bd', fontSize: '14px' }}>System Status</span>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#28a745' }}>Healthy</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ padding: '40px', display: 'flex', gap: '40px' }}>
+    <div style={{ minHeight: '100vh', background: '#0f172a', padding: '40px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         
-        {/* Left Column: Live Grid (Simulated) */}
-        <div style={{ flex: 2 }}>
-          <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#adb5bd' }}>Live Student Feeds</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
-            
-            {/* Example Student Card */}
-            <div style={{ backgroundColor: '#212529', borderRadius: '8px', padding: '20px', border: '1px solid #343a40' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <span style={{ fontWeight: 'bold' }}>Student #4092</span>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#28a745', marginTop: '4px' }} />
-              </div>
-              <div style={{ fontSize: '12px', color: '#adb5bd', marginBottom: '10px' }}>Exam: Java Arch 101</div>
-              
-              {/* Progress Bar */}
-              <div style={{ width: '100%', height: '6px', backgroundColor: '#343a40', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: '65%', height: '100%', backgroundColor: '#0d6efd' }} />
-              </div>
-              <div style={{ fontSize: '11px', textAlign: 'right', marginTop: '5px', color: '#6c757d' }}>65% Complete</div>
-              
-              <button style={{ width: '100%', padding: '8px', marginTop: '15px', backgroundColor: 'transparent', border: '1px solid #dc3545', color: '#dc3545', borderRadius: '4px', cursor: 'pointer' }}>
-                Terminate Session
-              </button>
-            </div>
-
-          </div>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#e2e8f0' }}>⚡ Admin Dashboard</h1>
+          <button onClick={onLogout} style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #475569', background: 'transparent', color: '#94a3b8' }}>Logout</button>
         </div>
 
-        {/* Right Column: Violation Alerts Stream */}
-        <div style={{ flex: 1, backgroundColor: '#212529', borderRadius: '8px', border: '1px solid #343a40', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '20px', borderBottom: '1px solid #343a40', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ margin: 0, fontSize: '18px', color: '#adb5bd' }}>Real-time Violations</h2>
-            <span style={{ backgroundColor: '#dc3545', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>
-              {alerts.length} New
-            </span>
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '30px' }}>
+          {tabBtn('students', '👥 Students')}
+          {tabBtn('leaderboard', '🏆 Leaderboard')}
+          {tabBtn('questions', '📝 Add Question')}
+        </div>
+
+        {/* Students Tab */}
+        {tab === 'students' && (
+          <div style={{ background: '#1e293b', borderRadius: '16px', padding: '24px', border: '1px solid #334155' }}>
+            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>All Students & Scores</h2>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #334155' }}>
+                  {['Name', 'Email', 'Score', 'Attempted', 'Actions'].map(h => (
+                    <th key={h} style={{ textAlign: 'left', padding: '12px', color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {students.map(s => (
+                  <tr key={s.studentId} style={{ borderBottom: '1px solid #1e293b' }}>
+                    <td style={{ padding: '14px', fontWeight: '600', color: '#e2e8f0' }}>{s.name}</td>
+                    <td style={{ padding: '14px', color: '#94a3b8' }}>{s.email}</td>
+                    <td style={{ padding: '14px', fontWeight: '700', color: '#818cf8' }}>{s.score}</td>
+                    <td style={{ padding: '14px', color: '#94a3b8' }}>{s.totalAttempted}</td>
+                    <td style={{ padding: '14px' }}>
+                      <button onClick={() => handleDelete(s.studentId)} style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #ef4444', background: 'transparent', color: '#ef4444', fontSize: '12px', cursor: 'pointer' }}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          
-          <div style={{ padding: '20px', overflowY: 'auto', flex: 1, maxHeight: '600px' }}>
-            {alerts.length === 0 ? (
-              <div style={{ color: '#6c757d', textAlign: 'center', marginTop: '40px' }}>
-                Listening for security events...
-              </div>
-            ) : (
-              alerts.map((alert) => (
-                <div key={alert.id} style={{ 
-                  backgroundColor: '#2c3034', 
-                  padding: '15px', 
-                  borderRadius: '6px', 
-                  marginBottom: '10px',
-                  borderLeft: '4px solid #dc3545',
-                  animation: 'fadeIn 0.3s ease-in-out'
-                }}>
-                  <div style={{ fontSize: '12px', color: '#adb5bd', marginBottom: '5px' }}>{alert.time}</div>
-                  <div style={{ fontSize: '14px', lineHeight: '1.4' }}>{alert.text}</div>
+        )}
+
+        {/* Leaderboard Tab */}
+        {tab === 'leaderboard' && (
+          <div style={{ background: '#1e293b', borderRadius: '16px', padding: '24px', border: '1px solid #334155' }}>
+            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>🏆 Top 10 Leaderboard</h2>
+            {leaderboard.map((entry, i) => (
+              <div key={entry.studentId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderRadius: '10px', marginBottom: '8px', background: '#0f172a' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <span style={{ fontSize: '20px', fontWeight: '800', width: '30px', color: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#cd7f32' : '#64748b' }}>
+                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                  </span>
+                  <span style={{ fontWeight: '600', color: '#e2e8f0' }}>{entry.name}</span>
                 </div>
-              ))
-            )}
+                <span style={{ fontWeight: '700', fontSize: '18px', color: '#818cf8' }}>{entry.score}</span>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
+
+        {/* Add Question Tab */}
+        {tab === 'questions' && (
+          <div style={{ background: '#1e293b', borderRadius: '16px', padding: '30px', border: '1px solid #334155' }}>
+            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>Add New Question</h2>
+            <form onSubmit={handleAddQuestion}>
+              <textarea value={newQ.questionText} onChange={e => setNewQ({ ...newQ, questionText: e.target.value })} placeholder="Question Text" required rows={3}
+                style={{ ...inputStyle, resize: 'vertical' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <input value={newQ.optionA} onChange={e => setNewQ({ ...newQ, optionA: e.target.value })} placeholder="Option A" required style={inputStyle} />
+                <input value={newQ.optionB} onChange={e => setNewQ({ ...newQ, optionB: e.target.value })} placeholder="Option B" required style={inputStyle} />
+                <input value={newQ.optionC} onChange={e => setNewQ({ ...newQ, optionC: e.target.value })} placeholder="Option C" required style={inputStyle} />
+                <input value={newQ.optionD} onChange={e => setNewQ({ ...newQ, optionD: e.target.value })} placeholder="Option D" required style={inputStyle} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '4px' }}>
+                <select value={newQ.correctOption} onChange={e => setNewQ({ ...newQ, correctOption: e.target.value })} style={inputStyle}>
+                  <option value="A">Correct: A</option><option value="B">Correct: B</option>
+                  <option value="C">Correct: C</option><option value="D">Correct: D</option>
+                </select>
+                <select value={newQ.topicCategory} onChange={e => setNewQ({ ...newQ, topicCategory: e.target.value })} style={inputStyle}>
+                  <option value="JAVA">Java</option><option value="PYTHON">Python</option>
+                  <option value="CN">Computer Networks</option><option value="OS">Operating Systems</option>
+                  <option value="SQL">SQL</option><option value="APTITUDE">Aptitude</option>
+                </select>
+              </div>
+              <button type="submit" style={{ marginTop: '8px', width: '100%', padding: '14px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', fontSize: '16px', fontWeight: '700' }}>
+                Add Question
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

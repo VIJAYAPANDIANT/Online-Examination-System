@@ -18,7 +18,6 @@ build/
 
 # IDE
 .idea/
-.vscode/
 *.iml
 *.iws
 

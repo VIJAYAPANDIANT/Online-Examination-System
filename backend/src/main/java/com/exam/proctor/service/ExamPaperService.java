@@ -27,7 +27,7 @@ public class ExamPaperService {
         Exam exam = examRepo.findById(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
 
-        List<Question> allQuestions = questionRepo.findByExamId(examId);
+        List<Question> allQuestions = questionRepo.findAll();
 
         // 1. Shuffle the Questions using the studentId's hashCode as a seed
         // This ensures the permutation is unique to the student but consistent on page
@@ -39,10 +39,11 @@ public class ExamPaperService {
         for (Question q : allQuestions) {
             QuestionDTO dto = new QuestionDTO();
             dto.setId(q.getId());
-            dto.setContentType(q.getContentType());
-            dto.setDifficultyLevel(q.getDifficultyLevel());
+            dto.setText(q.getQuestionText());
+            dto.setTopicCategory(q.getTopicCategory().name());
 
-            List<String> options = new ArrayList<>(q.getOptions());
+            List<String> options = new ArrayList<>(
+                    List.of(q.getOptionA(), q.getOptionB(), q.getOptionC(), q.getOptionD()));
             Collections.shuffle(options, new Random(studentId.hashCode() + q.getId().hashCode()));
             dto.setOptions(options);
 

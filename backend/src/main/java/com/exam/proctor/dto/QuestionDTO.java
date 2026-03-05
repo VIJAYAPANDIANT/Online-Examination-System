@@ -4,8 +4,8 @@ import java.util.List;
 
 public class QuestionDTO {
     private Long id;
-    private String contentType;
-    private String difficultyLevel;
+    private String text;
+    private String topicCategory;
     private List<String> options;
 
     public QuestionDTO() {
@@ -19,20 +19,20 @@ public class QuestionDTO {
         this.id = id;
     }
 
-    public String getContentType() {
-        return contentType;
+    public String getText() {
+        return text;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public String getDifficultyLevel() {
-        return difficultyLevel;
+    public String getTopicCategory() {
+        return topicCategory;
     }
 
-    public void setDifficultyLevel(String difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
+    public void setTopicCategory(String topicCategory) {
+        this.topicCategory = topicCategory;
     }
 
     public List<String> getOptions() {
