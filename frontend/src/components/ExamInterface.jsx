@@ -88,7 +88,7 @@ const ExamInterface = ({ user, topic, onComplete }) => {
 
   const handleExit = () => {
     if (window.confirm("Are you sure you want to exit? Your current exam progress will be lost.")) {
-      onComplete();
+      onExit();
     }
   };
 
