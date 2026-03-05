@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: proctor_db
+    environment:
+      POSTGRES_DB: proctordb
+      POSTGRES_USER: examuser
+      POSTGRES_PASSWORD: exampassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - exam_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: proctor_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - exam_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: proctor_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672" # Management UI
+    networks:
+      - exam_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: proctor_backend
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/proctordb
+      - SPRING_DATASOURCE_USERNAME=examuser
+      - SPRING_DATASOURCE_PASSWORD=exampassword
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - exam_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: proctor_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - exam_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: proctor_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - exam_network
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  exam_network:
+    driver: bridge
