@@ -10,6 +10,7 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const [examFinished, setExamFinished] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     // Load from store (merges static questionBank with localStorage)
@@ -60,11 +61,10 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   };
 
   const handleFinish = () => {
-    if (!allAnswered) {
-      if (!window.confirm(`You have only answered ${Object.keys(submitted).length} out of ${questions.length} questions. Are you sure you want to finish now?`)) {
-        return;
-      }
-    }
+    setShowConfirm(true);
+  };
+
+  const confirmFinish = () => {
     // Save final score to leaderboard
     const finalScore = score;
     const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
@@ -75,6 +75,7 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
       scores.push({ id: user.id, name: user.name, email: user.email, score: finalScore });
     }
     localStorage.setItem('leaderboard', JSON.stringify(scores));
+    setShowConfirm(false);
     setExamFinished(true);
   };
 
@@ -87,10 +88,82 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   };
 
   const handleExit = () => {
-    if (window.confirm("Are you sure you want to exit? Your current exam progress will be lost.")) {
-      onExit();
-    }
+    onExit();
   };
+
+  // ── Confirmation Screen ──
+  if (showConfirm) {
+    const unanswered = questions.length - Object.keys(submitted).length;
+    return (
+      <div style={{
+        minHeight: '100vh', background: '#0f172a',
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        <div style={{
+          background: '#1e293b', borderRadius: '20px', padding: '48px 40px',
+          maxWidth: '480px', width: '90%', textAlign: 'center',
+          border: '1px solid #334155', boxShadow: '0 25px 60px rgba(0,0,0,0.5)'
+        }}>
+          <div style={{ fontSize: '52px', marginBottom: '16px' }}>📋</div>
+          <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#e2e8f0', marginBottom: '12px' }}>
+            Finish the Exam?
+          </h2>
+
+          {unanswered > 0 ? (
+            <div style={{
+              background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234,179,8,0.3)',
+              borderRadius: '12px', padding: '14px 18px', marginBottom: '24px'
+            }}>
+              <p style={{ color: '#eab308', fontSize: '15px', fontWeight: '600', margin: 0 }}>
+                ⚠️ You have {unanswered} unanswered {unanswered === 1 ? 'question' : 'questions'}.
+              </p>
+              <p style={{ color: '#94a3b8', fontSize: '13px', marginTop: '6px', marginBottom: 0 }}>
+                Unanswered questions will be marked as incorrect.
+              </p>
+            </div>
+          ) : (
+            <p style={{ color: '#94a3b8', fontSize: '15px', marginBottom: '24px' }}>
+              You have answered all {questions.length} questions. Ready to submit?
+            </p>
+          )}
+
+          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '32px' }}>
+            Your score: <strong style={{ color: '#818cf8' }}>{score} / {questions.length}</strong>
+          </p>
+
+          <div style={{ display: 'flex', gap: '14px', justifyContent: 'center' }}>
+            <button
+              onClick={() => setShowConfirm(false)}
+              style={{
+                flex: 1, padding: '14px', borderRadius: '12px',
+                border: '1px solid #475569', background: 'transparent',
+                color: '#94a3b8', fontSize: '15px', fontWeight: '600',
+                cursor: 'pointer', transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => { e.target.style.background = '#334155'; e.target.style.color = '#e2e8f0'; }}
+              onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.color = '#94a3b8'; }}
+            >
+              ← Go Back
+            </button>
+            <button
+              onClick={confirmFinish}
+              style={{
+                flex: 1, padding: '14px', borderRadius: '12px', border: 'none',
+                background: 'linear-gradient(135deg, #22c55e, #10b981)',
+                color: '#fff', fontSize: '15px', fontWeight: '700',
+                cursor: 'pointer', transition: 'all 0.2s',
+                boxShadow: '0 4px 16px rgba(34,197,94,0.3)'
+              }}
+              onMouseEnter={e => e.target.style.transform = 'scale(1.03)'}
+              onMouseLeave={e => e.target.style.transform = 'scale(1)'}
+            >
+              ✅ Yes, Finish
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── Finished Screen: Score + Leaderboard ──
   if (examFinished) {
