@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import questionBank from '../data/questionBank.js';
 
-const ExamInterface = ({ user, topic, onComplete }) => {
+const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
