@@ -57,7 +57,7 @@ const LoginPage = ({ onLogin }) => {
 
     // ── Admin bypass ───────────────────────────────────────────────────
     const ADMIN_EMAIL = 'vijayapandian112007@gmail.com';
-    if (!isRegister && email.toLowerCase() === ADMIN_EMAIL && password === 'admin') {
+    if (!isRegister && email.toLowerCase() === ADMIN_EMAIL && password === '1234567890') {
       const adminUser = { id: 0, name: 'Vijayapandian (Admin)', email: ADMIN_EMAIL, role: 'ADMIN' };
       notifyAdmin('Admin Login', adminUser);
       onLogin(adminUser);

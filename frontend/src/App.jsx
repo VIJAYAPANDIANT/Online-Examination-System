@@ -28,15 +28,17 @@ function App() {
       const topic = hash.split('/')[1];
       setSelectedTopic(topic);
       setPage('exam');
-    } else if (hash === 'admin' && userData.role === 'ADMIN') {
+    } else if (userData.role === 'ADMIN') {
+      // Admin is strictly restricted to the admin dashboard
       setPage('admin');
+      if (hash !== 'admin') window.location.hash = 'admin';
     } else if (hash === 'results') {
       setPage('results');
     } else if (hash === 'topics') {
       setPage('topics');
     } else {
-      // Default based on role
-      setPage(userData.role === 'ADMIN' ? 'admin' : 'topics');
+      setPage('topics');
+      window.location.hash = 'topics';
     }
   }, []);
 
@@ -71,7 +73,7 @@ function App() {
 
   const handleExitExam = () => {
     if (window.confirm("Are you sure you want to exit? Your current exam progress will be lost.")) {
-      navigate('topics');
+      navigate(user.role === 'ADMIN' ? 'admin' : 'topics');
     }
   };
 
@@ -90,10 +92,10 @@ function App() {
   return (
     <div>
       {page === 'login' && <LoginPage onLogin={handleLogin} />}
-      {page === 'topics' && <TopicSelection user={user} onSelect={handleTopicSelect} onLogout={handleLogout} />}
-      {page === 'exam' && <ExamInterface user={user} topic={selectedTopic} onComplete={handleExamComplete} onExit={() => navigate('topics')} />}
-      {page === 'results' && <ResultScreen user={user} onBack={() => navigate('topics')} onLogout={handleLogout} />}
-      {page === 'admin' && <AdminDashboard user={user} onLogout={handleLogout} />}
+      {page === 'topics' && user.role !== 'ADMIN' && <TopicSelection user={user} onSelect={handleTopicSelect} onLogout={handleLogout} />}
+      {page === 'exam' && <ExamInterface user={user} topic={selectedTopic} onComplete={handleExamComplete} onExit={() => navigate(user.role === 'ADMIN' ? 'admin' : 'topics')} />}
+      {page === 'results' && <ResultScreen user={user} onBack={() => navigate(user.role === 'ADMIN' ? 'admin' : 'topics')} onLogout={handleLogout} />}
+      {page === 'admin' && user.role === 'ADMIN' && <AdminDashboard user={user} onLogout={handleLogout} />}
     </div>
   );
 }
