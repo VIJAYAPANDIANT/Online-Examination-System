@@ -65,12 +65,28 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   };
 
   const confirmFinish = () => {
-    // Save final score to leaderboard
     const finalScore = score;
+
+    // Save per-question results so ResultScreen can display the correct score
+    const examResultData = questions.map((q, i) => ({
+      questionId: q.id || i,
+      questionText: q.questionText,
+      selected: submitted[i] || null,
+      correct: q.correctOption,
+      isCorrect: submitted[i] === q.correctOption,
+    }));
+    localStorage.setItem('examResults_' + user.id, JSON.stringify(examResultData));
+    localStorage.setItem('lastExamScore_' + user.id, JSON.stringify({
+      score: finalScore,
+      total: questions.length,
+      topic: topic || 'Exam',
+    }));
+
+    // Save final score to leaderboard
     const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
     const existing = scores.findIndex(s => s.id === user.id);
     if (existing >= 0) {
-      scores[existing].score += finalScore;
+      scores[existing].score = Math.max(scores[existing].score, finalScore);
     } else {
       scores.push({ id: user.id, name: user.name, email: user.email, score: finalScore });
     }
