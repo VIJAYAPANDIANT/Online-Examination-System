@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import store from '../data/store';
 
 const AdminDashboard = ({ user, onLogout }) => {
   const [tab, setTab] = useState('students');
   const [students, setStudents] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [newQ, setNewQ] = useState({ questionText: '', optionA: '', optionB: '', optionC: '', optionD: '', correctOption: 'A', topicCategory: 'JAVA' });
+  const [topics, setTopics] = useState(store.getTopics());
+  const [showNewTopicForm, setShowNewTopicForm] = useState(false);
+  const [newTopic, setNewTopic] = useState({ key: '', label: '', icon: '🧩', color: '#6366f1', desc: '' });
+  const [newQ, setNewQ] = useState({ 
+    questionText: '', 
+    optionA: '', 
+    optionB: '', 
+    optionC: '', 
+    optionD: '', 
+    correctOption: 'A', 
+    topicCategory: 'JAVA' 
+  });
 
   useEffect(() => {
     fetchData();
@@ -30,13 +42,30 @@ const AdminDashboard = ({ user, onLogout }) => {
     }
   };
 
-  const handleAddQuestion = async (e) => {
+  const handleAddQuestion = (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/admin/questions', newQ);
-      alert('Question added!');
-      setNewQ({ questionText: '', optionA: '', optionB: '', optionC: '', optionD: '', correctOption: 'A', topicCategory: 'JAVA' });
-    } catch { alert('Failed to add question'); }
+      store.addQuestion(newQ);
+      alert('Question added successfully!');
+      setNewQ({ ...newQ, questionText: '', optionA: '', optionB: '', optionC: '', optionD: '' });
+    } catch (err) {
+      alert('Failed to add question: ' + err.message);
+    }
+  };
+
+  const handleCreateTopic = (e) => {
+    e.preventDefault();
+    try {
+      if (!newTopic.key || !newTopic.label) return alert("Key and Label are required");
+      store.addTopic({ ...newTopic, key: newTopic.key.toUpperCase() });
+      setTopics(store.getTopics());
+      setNewQ({ ...newQ, topicCategory: newTopic.key.toUpperCase() });
+      setShowNewTopicForm(false);
+      setNewTopic({ key: '', label: '', icon: '🧩', color: '#6366f1', desc: '' });
+      alert('Topic created!');
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -114,32 +143,66 @@ const AdminDashboard = ({ user, onLogout }) => {
 
         {/* Add Question Tab */}
         {tab === 'questions' && (
-          <div style={{ background: '#1e293b', borderRadius: '16px', padding: '30px', border: '1px solid #334155' }}>
-            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>Add New Question</h2>
-            <form onSubmit={handleAddQuestion}>
-              <textarea value={newQ.questionText} onChange={e => setNewQ({ ...newQ, questionText: e.target.value })} placeholder="Question Text" required rows={3}
-                style={{ ...inputStyle, resize: 'vertical' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <input value={newQ.optionA} onChange={e => setNewQ({ ...newQ, optionA: e.target.value })} placeholder="Option A" required style={inputStyle} />
-                <input value={newQ.optionB} onChange={e => setNewQ({ ...newQ, optionB: e.target.value })} placeholder="Option B" required style={inputStyle} />
-                <input value={newQ.optionC} onChange={e => setNewQ({ ...newQ, optionC: e.target.value })} placeholder="Option C" required style={inputStyle} />
-                <input value={newQ.optionD} onChange={e => setNewQ({ ...newQ, optionD: e.target.value })} placeholder="Option D" required style={inputStyle} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            {/* New Topic Toggle */}
+            <div style={{ background: '#1e293b', borderRadius: '16px', padding: '20px', border: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ color: '#e2e8f0', margin: 0 }}>Need a new topic?</h3>
+                <p style={{ color: '#94a3b8', fontSize: '13px', margin: '4px 0 0' }}>Create a new category before adding questions.</p>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '4px' }}>
-                <select value={newQ.correctOption} onChange={e => setNewQ({ ...newQ, correctOption: e.target.value })} style={inputStyle}>
-                  <option value="A">Correct: A</option><option value="B">Correct: B</option>
-                  <option value="C">Correct: C</option><option value="D">Correct: D</option>
-                </select>
-                <select value={newQ.topicCategory} onChange={e => setNewQ({ ...newQ, topicCategory: e.target.value })} style={inputStyle}>
-                  <option value="JAVA">Java</option><option value="PYTHON">Python</option>
-                  <option value="CN">Computer Networks</option><option value="OS">Operating Systems</option>
-                  <option value="SQL">SQL</option><option value="APTITUDE">Aptitude</option>
-                </select>
-              </div>
-              <button type="submit" style={{ marginTop: '8px', width: '100%', padding: '14px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', fontSize: '16px', fontWeight: '700' }}>
-                Add Question
+              <button onClick={() => setShowNewTopicForm(!showNewTopicForm)} style={{ padding: '10px 20px', borderRadius: '8px', background: showNewTopicForm ? '#ef4444' : '#6366f1', color: '#fff', border: 'none', fontWeight: '600' }}>
+                {showNewTopicForm ? 'Cancel' : '➕ Create New Topic'}
               </button>
-            </form>
+            </div>
+
+            {/* New Topic Form */}
+            {showNewTopicForm && (
+              <div style={{ background: '#1e293b', borderRadius: '16px', padding: '30px', border: '2px solid #6366f1' }}>
+                <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>Create New Topic</h2>
+                <form onSubmit={handleCreateTopic}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <input value={newTopic.label} onChange={e => setNewTopic({ ...newTopic, label: e.target.value })} placeholder="Topic Name (e.g. React)" required style={inputStyle} />
+                    <input value={newTopic.key} onChange={e => setNewTopic({ ...newTopic, key: e.target.value.toUpperCase() })} placeholder="Topic Key (e.g. REACT)" required style={inputStyle} />
+                    <input value={newTopic.icon} onChange={e => setNewTopic({ ...newTopic, icon: e.target.value })} placeholder="Icon Emoji (e.g. ⚛️)" required style={inputStyle} />
+                    <input value={newTopic.color} title="Pick a color" type="color" onChange={e => setNewTopic({ ...newTopic, color: e.target.value })} style={{ ...inputStyle, padding: '2px' }} />
+                  </div>
+                  <textarea value={newTopic.desc} onChange={e => setNewTopic({ ...newTopic, desc: e.target.value })} placeholder="Description (e.g. 50 MCQs on Modern Frontend...)" required rows={2} style={{ ...inputStyle, resize: 'none' }} />
+                  <button type="submit" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', background: '#6366f1', color: '#fff', fontSize: '15px', fontWeight: '700' }}>
+                    Save Topic
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* Add Question Form */}
+            <div style={{ background: '#1e293b', borderRadius: '16px', padding: '30px', border: '1px solid #334155' }}>
+              <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>Add New Question</h2>
+              <form onSubmit={handleAddQuestion}>
+                <textarea value={newQ.questionText} onChange={e => setNewQ({ ...newQ, questionText: e.target.value })} placeholder="Question Text" required rows={3}
+                  style={{ ...inputStyle, resize: 'vertical' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <input value={newQ.optionA} onChange={e => setNewQ({ ...newQ, optionA: e.target.value })} placeholder="Option A" required style={inputStyle} />
+                  <input value={newQ.optionB} onChange={e => setNewQ({ ...newQ, optionB: e.target.value })} placeholder="Option B" required style={inputStyle} />
+                  <input value={newQ.optionC} onChange={e => setNewQ({ ...newQ, optionC: e.target.value })} placeholder="Option C" required style={inputStyle} />
+                  <input value={newQ.optionD} onChange={e => setNewQ({ ...newQ, optionD: e.target.value })} placeholder="Option D" required style={inputStyle} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '4px' }}>
+                  <select value={newQ.correctOption} onChange={e => setNewQ({ ...newQ, correctOption: e.target.value })} style={inputStyle}>
+                    <option value="A">Correct: A</option><option value="B">Correct: B</option>
+                    <option value="C">Correct: C</option><option value="D">Correct: D</option>
+                  </select>
+                  <select value={newQ.topicCategory} onChange={e => setNewQ({ ...newQ, topicCategory: e.target.value })} style={inputStyle}>
+                    {topics.map(t => (
+                      <option key={t.key} value={t.key}>{t.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <button type="submit" style={{ marginTop: '8px', width: '100%', padding: '14px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', fontSize: '16px', fontWeight: '700' }}>
+                  Add Question
+                </button>
+              </form>
+            </div>
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import questionBank from '../data/questionBank.js';
+import store from '../data/store';
 
 const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   const [questions, setQuestions] = useState([]);
@@ -12,8 +12,8 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
   const [examFinished, setExamFinished] = useState(false);
 
   useEffect(() => {
-    // Load from local questionBank since backend isn't running
-    const data = questionBank[topic] || [];
+    // Load from store (merges static questionBank with localStorage)
+    const data = store.getQuestions(topic);
     
     // Use correctOption directly as it's already 'A', 'B', 'C', or 'D' in the local questionBank
     const mappedData = data.map(q => ({
