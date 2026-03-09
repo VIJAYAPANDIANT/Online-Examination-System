@@ -4,6 +4,7 @@ import TopicSelection from './components/TopicSelection.jsx';
 import ExamInterface from './components/ExamInterface.jsx';
 import ResultScreen from './components/ResultScreen.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
+import StudentDashboard from './components/StudentDashboard.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -78,11 +79,25 @@ function App() {
   };
 
   const handleLogout = () => {
+    // Record logout time in session logs
+    const activeSessionId = localStorage.getItem('active_session_id');
+    if (activeSessionId) {
+      const logs = JSON.parse(localStorage.getItem('session_logs') || '[]');
+      const logIndex = logs.findIndex(l => String(l.id) === String(activeSessionId));
+      if (logIndex >= 0) {
+        logs[logIndex].logoutTime = new Date().toISOString();
+        localStorage.setItem('session_logs', JSON.stringify(logs));
+      }
+      localStorage.removeItem('active_session_id');
+    }
+
     setUser(null);
     localStorage.removeItem('exam_auth_user');
     window.location.hash = 'login';
     setPage('login');
     setSelectedTopic(null);
+    // Ensure active test flag is cleared on logout
+    localStorage.removeItem('active_exam_user_' + user?.id);
   };
 
   if (loading) {
@@ -92,7 +107,13 @@ function App() {
   return (
     <div>
       {page === 'login' && <LoginPage onLogin={handleLogin} />}
-      {page === 'topics' && user.role !== 'ADMIN' && <TopicSelection user={user} onSelect={handleTopicSelect} onLogout={handleLogout} />}
+      {page === 'topics' && user.role !== 'ADMIN' && (
+        <StudentDashboard 
+          user={user} 
+          onSelect={handleTopicSelect} 
+          onLogout={handleLogout} 
+        />
+      )}
       {page === 'exam' && <ExamInterface user={user} topic={selectedTopic} onComplete={handleExamComplete} onExit={() => navigate(user.role === 'ADMIN' ? 'admin' : 'topics')} />}
       {page === 'results' && <ResultScreen user={user} onBack={() => navigate(user.role === 'ADMIN' ? 'admin' : 'topics')} onLogout={handleLogout} />}
       {page === 'admin' && user.role === 'ADMIN' && <AdminDashboard user={user} onLogout={handleLogout} />}

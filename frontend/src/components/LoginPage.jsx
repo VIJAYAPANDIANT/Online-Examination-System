@@ -55,11 +55,29 @@ const LoginPage = ({ onLogin }) => {
     e.preventDefault();
     setError('');
 
+    // ── Record Session Log ─────────────────────────────────────────────
+    const recordSession = (user) => {
+      const logs = JSON.parse(localStorage.getItem('session_logs') || '[]');
+      const sessionId = Date.now();
+      const newLog = {
+        id: sessionId,
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        loginTime: new Date().toISOString(),
+        logoutTime: null
+      };
+      logs.push(newLog);
+      localStorage.setItem('session_logs', JSON.stringify(logs));
+      localStorage.setItem('active_session_id', sessionId);
+    };
+
     // ── Admin bypass ───────────────────────────────────────────────────
     const ADMIN_EMAIL = 'vijayapandian112007@gmail.com';
     if (!isRegister && email.toLowerCase() === ADMIN_EMAIL && password === '1234567890') {
       const adminUser = { id: 0, name: 'Vijayapandian (Admin)', email: ADMIN_EMAIL, role: 'ADMIN' };
       notifyAdmin('Admin Login', adminUser);
+      recordSession(adminUser);
       onLogin(adminUser);
       return;
     }
@@ -83,6 +101,7 @@ const LoginPage = ({ onLogin }) => {
       saveUser(newUser);
       const { password: _p, ...safeUser } = newUser;
       notifyAdmin('New Account Registration', safeUser);
+      recordSession(safeUser);
       onLogin(safeUser);
 
     } else {
@@ -94,6 +113,7 @@ const LoginPage = ({ onLogin }) => {
       if (found) {
         const { password: _p, ...safeUser } = found;
         notifyAdmin('User Login', safeUser);
+        recordSession(safeUser);
         onLogin(safeUser);
         return;
       }

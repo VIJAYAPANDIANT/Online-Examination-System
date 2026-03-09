@@ -1,31 +1,37 @@
 import React from 'react';
 import store from '../data/store';
 
-const TopicSelection = ({ user, onSelect, onLogout }) => {
+const TopicSelection = ({ user, onSelect, onLogout, hideHeader = false }) => {
   const topics = store.getTopics();
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%)', padding: '40px 20px' }}>
+    <div style={{ 
+      minHeight: hideHeader ? 'auto' : '100vh', 
+      background: hideHeader ? 'transparent' : 'linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%)', 
+      padding: hideHeader ? '0' : '40px 20px' 
+    }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '950px', margin: '0 auto 40px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ fontSize: '36px' }}>🐛</span>
-          <div>
-            <h1 style={{ fontSize: '28px', fontWeight: '900', background: 'linear-gradient(135deg, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.5px' }}>BUG</h1>
-            <p style={{ color: '#64748b', fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase' }}>Examination Platform</p>
+      {!hideHeader && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '950px', margin: '0 auto 40px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ fontSize: '32px' }}>🐛</span>
+            <div>
+              <h1 style={{ fontSize: '28px', fontWeight: '900', background: 'linear-gradient(135deg, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.5px' }}>BUG</h1>
+              <p style={{ color: '#64748b', fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase' }}>Examination Platform</p>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ color: '#e2e8f0', fontWeight: '600', fontSize: '14px' }}>{user?.name}</p>
+              <p style={{ color: '#64748b', fontSize: '12px' }}>{user?.email}</p>
+            </div>
+            <button onClick={onLogout} style={{ padding: '10px 20px', borderRadius: '10px', border: '1px solid #475569', background: 'rgba(30, 41, 59, 0.5)', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}
+              onMouseEnter={e => e.target.style.borderColor = '#6366f1'} onMouseLeave={e => e.target.style.borderColor = '#475569'}
+            >
+              Logout
+            </button>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ color: '#e2e8f0', fontWeight: '600', fontSize: '14px' }}>{user?.name}</p>
-            <p style={{ color: '#64748b', fontSize: '12px' }}>{user?.email}</p>
-          </div>
-          <button onClick={onLogout} style={{ padding: '10px 20px', borderRadius: '10px', border: '1px solid #475569', background: 'rgba(30, 41, 59, 0.5)', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}
-            onMouseEnter={e => e.target.style.borderColor = '#6366f1'} onMouseLeave={e => e.target.style.borderColor = '#475569'}
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Welcome Banner */}
       <div style={{ maxWidth: '950px', margin: '0 auto 36px', padding: '28px 32px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.15)' }}>

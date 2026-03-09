@@ -88,36 +88,111 @@ const AdminDashboard = ({ user, onLogout }) => {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '30px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '30px', flexWrap: 'wrap' }}>
+          {tabBtn('stats', '📊 Stats')}
           {tabBtn('students', '👥 Students')}
+          {tabBtn('reports', '🕒 Login Reports')}
           {tabBtn('leaderboard', '🏆 Leaderboard')}
-          {tabBtn('questions', '📝 Add Question')}
+          {tabBtn('questions', '📝 Add Test/Question')}
         </div>
 
-        {/* Students Tab */}
+        {/* Stats Tab */}
+        {tab === 'stats' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+            {(() => {
+              const allRegistered = JSON.parse(localStorage.getItem('exam_users') || '[]');
+              const activeTests = Object.keys(localStorage).filter(k => k.startsWith('active_exam_user_')).length;
+              const totalScores = JSON.parse(localStorage.getItem('leaderboard') || '[]').length;
+              
+              return (
+                <>
+                  <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', padding: '30px', borderRadius: '20px', border: '1px solid #334155' }}>
+                    <p style={{ color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase', marginBottom: '8px' }}>Registered Students</p>
+                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#818cf8', margin: 0 }}>{allRegistered.length + 2}</p>
+                    <p style={{ color: '#475569', fontSize: '12px', marginTop: '4px' }}>Including demo accounts</p>
+                  </div>
+                  <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', padding: '30px', borderRadius: '20px', border: '1px solid #334155' }}>
+                    <p style={{ color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase', marginBottom: '8px' }}>Currently Taking Test</p>
+                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#10b981', margin: 0 }}>{activeTests}</p>
+                    <p style={{ color: '#475569', fontSize: '12px', marginTop: '4px' }}>Live active sessions</p>
+                  </div>
+                  <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', padding: '30px', borderRadius: '20px', border: '1px solid #334155' }}>
+                    <p style={{ color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase', marginBottom: '8px' }}>Tests Completed</p>
+                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#f59e0b', margin: 0 }}>{totalScores}</p>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* Students Tab - Detailed Registeration Info */}
         {tab === 'students' && (
           <div style={{ background: '#1e293b', borderRadius: '16px', padding: '24px', border: '1px solid #334155' }}>
-            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>All Students & Scores</h2>
+            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>Registered Students Details</h2>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #334155' }}>
+                    {['Name', 'Email', 'Role', 'Status'].map(h => (
+                      <th key={h} style={{ textAlign: 'left', padding: '12px', color: '#94a3b8', fontSize: '13px' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...JSON.parse(localStorage.getItem('exam_users') || '[]')].map(s => (
+                    <tr key={s.id} style={{ borderBottom: '1px solid #1e293b' }}>
+                      <td style={{ padding: '14px', fontWeight: '600', color: '#e2e8f0' }}>{s.name}</td>
+                      <td style={{ padding: '14px', color: '#94a3b8' }}>{s.email}</td>
+                      <td style={{ padding: '14px', fontSize: '12px' }}><span style={{ padding: '2px 8px', borderRadius: '4px', background: '#0f172a', color: '#818cf8' }}>{s.role}</span></td>
+                      <td style={{ padding: '14px' }}>
+                        {localStorage.getItem('active_exam_user_' + s.id) ? 
+                          <span style={{ color: '#10b981', fontSize: '12px' }}>● Taking {localStorage.getItem('active_exam_user_' + s.id)}</span> : 
+                          <span style={{ color: '#475569', fontSize: '12px' }}>Inactive</span>
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Reports Tab - Login/Logout Timing */}
+        {tab === 'reports' && (
+          <div style={{ background: '#1e293b', borderRadius: '16px', padding: '24px', border: '1px solid #334155' }}>
+            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>Student Session Reports</h2>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #334155' }}>
-                  {['Name', 'Email', 'Score', 'Attempted', 'Actions'].map(h => (
-                    <th key={h} style={{ textAlign: 'left', padding: '12px', color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase' }}>{h}</th>
+                  {['Student', 'Login Time', 'Logout Time', 'Duration'].map(h => (
+                    <th key={h} style={{ textAlign: 'left', padding: '12px', color: '#94a3b8', fontSize: '13px' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {students.map(s => (
-                  <tr key={s.studentId} style={{ borderBottom: '1px solid #1e293b' }}>
-                    <td style={{ padding: '14px', fontWeight: '600', color: '#e2e8f0' }}>{s.name}</td>
-                    <td style={{ padding: '14px', color: '#94a3b8' }}>{s.email}</td>
-                    <td style={{ padding: '14px', fontWeight: '700', color: '#818cf8' }}>{s.score}</td>
-                    <td style={{ padding: '14px', color: '#94a3b8' }}>{s.totalAttempted}</td>
-                    <td style={{ padding: '14px' }}>
-                      <button onClick={() => handleDelete(s.studentId)} style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #ef4444', background: 'transparent', color: '#ef4444', fontSize: '12px', cursor: 'pointer' }}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
+                {[...JSON.parse(localStorage.getItem('session_logs') || '[]')].reverse().slice(0, 20).map(log => {
+                  const login = new Date(log.loginTime);
+                  const logout = log.logoutTime ? new Date(log.logoutTime) : null;
+                  const duration = logout ? Math.round((logout - login) / 60000) : null;
+
+                  return (
+                    <tr key={log.id} style={{ borderBottom: '1px solid #1e293b' }}>
+                      <td style={{ padding: '14px' }}>
+                        <div style={{ color: '#e2e8f0', fontWeight: '600' }}>{log.name}</div>
+                        <div style={{ fontSize: '11px', color: '#64748b' }}>{log.email}</div>
+                      </td>
+                      <td style={{ padding: '14px', color: '#94a3b8', fontSize: '13px' }}>{login.toLocaleTimeString()} <br/> <small>{login.toLocaleDateString()}</small></td>
+                      <td style={{ padding: '14px', color: '#94a3b8', fontSize: '13px' }}>
+                        {logout ? <>{logout.toLocaleTimeString()} <br/> <small>{logout.toLocaleDateString()}</small></> : <span style={{ color: '#10b981', fontWeight: '700' }}>Active Now</span>}
+                      </td>
+                      <td style={{ padding: '14px', color: '#6366f1', fontWeight: '600' }}>
+                        {duration !== null ? `${duration} min` : '--'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -126,18 +201,24 @@ const AdminDashboard = ({ user, onLogout }) => {
         {/* Leaderboard Tab */}
         {tab === 'leaderboard' && (
           <div style={{ background: '#1e293b', borderRadius: '16px', padding: '24px', border: '1px solid #334155' }}>
-            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>🏆 Top 10 Leaderboard</h2>
-            {leaderboard.map((entry, i) => (
-              <div key={entry.studentId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderRadius: '10px', marginBottom: '8px', background: '#0f172a' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <span style={{ fontSize: '20px', fontWeight: '800', width: '30px', color: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#cd7f32' : '#64748b' }}>
-                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
-                  </span>
-                  <span style={{ fontWeight: '600', color: '#e2e8f0' }}>{entry.name}</span>
+            <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>🏆 Overall Cumulative Leaderboard</h2>
+            {(() => {
+              const lb = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+              return lb.sort((a,b) => b.score - a.score).map((entry, i) => (
+                <div key={entry.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderRadius: '10px', marginBottom: '8px', background: '#0f172a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <span style={{ fontSize: '20px', fontWeight: '800', width: '30px', color: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#cd7f32' : '#64748b' }}>
+                      {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                    </span>
+                    <div>
+                      <span style={{ fontWeight: '600', color: '#e2e8f0' }}>{entry.name}</span>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>Best scores: {entry.topicScores ? Object.keys(entry.topicScores).length : 0} topics</div>
+                    </div>
+                  </div>
+                  <span style={{ fontWeight: '700', fontSize: '18px', color: '#818cf8' }}>{entry.score}</span>
                 </div>
-                <span style={{ fontWeight: '700', fontSize: '18px', color: '#818cf8' }}>{entry.score}</span>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
 

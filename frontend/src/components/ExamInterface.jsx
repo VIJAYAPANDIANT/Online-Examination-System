@@ -24,7 +24,18 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
     
     setQuestions(mappedData);
     setLoading(false);
-  }, [topic]);
+
+    // Track active exam session for admin dashboard
+    if (user && user.role === 'STUDENT') {
+      localStorage.setItem('active_exam_user_' + user.id, topic);
+    }
+
+    return () => {
+      if (user && user.role === 'STUDENT') {
+        localStorage.removeItem('active_exam_user_' + user.id);
+      }
+    };
+  }, [topic, user]);
 
   const allAnswered = questions.length > 0 && Object.keys(submitted).length === questions.length;
 
@@ -82,15 +93,31 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
       topic: topic || 'Exam',
     }));
 
-    // Save final score to leaderboard
-    const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-    const existing = scores.findIndex(s => s.id === user.id);
-    if (existing >= 0) {
-      scores[existing].score = Math.max(scores[existing].score, finalScore);
+    // Save final score to leaderboard with topic-specific granularity
+    const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+    let userEntry = leaderboard.find(s => s.id === user.id);
+    
+    if (!userEntry) {
+      userEntry = { 
+        id: user.id, 
+        name: user.name, 
+        email: user.email, 
+        score: finalScore,
+        topicScores: { [topic]: finalScore }
+      };
+      leaderboard.push(userEntry);
     } else {
-      scores.push({ id: user.id, name: user.name, email: user.email, score: finalScore });
+      // Initialize topicScores if it doesn't exist (migration for existing users)
+      if (!userEntry.topicScores) userEntry.topicScores = {};
+      
+      // Update this topic's best score
+      userEntry.topicScores[topic] = Math.max(userEntry.topicScores[topic] || 0, finalScore);
+      
+      // Calculate overall score as sum of best scores of each topic
+      userEntry.score = Object.values(userEntry.topicScores).reduce((sum, val) => sum + val, 0);
     }
-    localStorage.setItem('leaderboard', JSON.stringify(scores));
+    
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
     setShowConfirm(false);
     setExamFinished(true);
   };
