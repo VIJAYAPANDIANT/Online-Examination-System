@@ -1,17 +1,16 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
+  mysql:
+    image: mysql:8.0
     container_name: proctor_db
     environment:
-      POSTGRES_DB: proctordb
-      POSTGRES_USER: examuser
-      POSTGRES_PASSWORD: exampassword
+      MYSQL_DATABASE: proctordb
+      MYSQL_ROOT_PASSWORD: exampassword
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mysqldata:/var/lib/mysql
     networks:
       - exam_network
 
@@ -40,8 +39,8 @@ services:
       dockerfile: Dockerfile
     container_name: proctor_backend
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/proctordb
-      - SPRING_DATASOURCE_USERNAME=examuser
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/proctordb
+      - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=exampassword
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
@@ -50,7 +49,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      - mysql
       - redis
       - rabbitmq
     networks:
@@ -84,7 +83,7 @@ services:
       - exam_network
 
 volumes:
-  pgdata:
+  mysqldata:
   redisdata:
 
 networks:
