@@ -3,7 +3,6 @@ package com.exam.proctor.service;
 import com.exam.proctor.entity.ProctorLog;
 import com.exam.proctor.event.ExamAutoSubmitEvent;
 import com.exam.proctor.repository.ProctorLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,17 +11,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProctorService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ProctorLogRepository proctorLogRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    private ProctorLogRepository proctorLogRepository;
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    public ProctorService(RedisTemplate<String, Object> redisTemplate,
+                          ProctorLogRepository proctorLogRepository,
+                          ApplicationEventPublisher eventPublisher,
+                          SimpMessagingTemplate messagingTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.proctorLogRepository = proctorLogRepository;
+        this.eventPublisher = eventPublisher;
+        this.messagingTemplate = messagingTemplate;
+    }
 
     private static final String REDIS_KEY_PREFIX = "violation_pts:";
 
