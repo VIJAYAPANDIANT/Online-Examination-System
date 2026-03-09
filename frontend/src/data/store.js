@@ -41,13 +41,13 @@ const store = {
     const { topicCategory, ...questionData } = q;
     const key = topicCategory.toUpperCase();
     const customQs = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUESTIONS(key)) || '[]');
-    
+
     // Generate a unique ID (Static IDs are 1-50, we use timestamp for custom)
     const newQuestion = {
       ...questionData,
       id: Date.now(),
     };
-    
+
     customQs.push(newQuestion);
     localStorage.setItem(STORAGE_KEYS.QUESTIONS(key), JSON.stringify(customQs));
   }

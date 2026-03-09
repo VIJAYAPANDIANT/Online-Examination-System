@@ -8,10 +8,10 @@ import com.exam.proctor.service.LeaderboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -36,24 +36,23 @@ public class AdminController {
 
     @GetMapping("/students/{id}")
     public ResponseEntity<?> getStudent(@PathVariable long id) {
-        Optional<User> user = userRepo.findById(id);
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
-        }
-        return ResponseEntity.notFound().build();
+        return userRepo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/students/{id}")
-    public ResponseEntity<?> updateStudent(@PathVariable long id, @RequestBody User updates) {
-        Optional<User> userOpt = userRepo.findById(id);
-        if (userOpt.isEmpty())
+    public ResponseEntity<?> updateStudent(@PathVariable long id, @NonNull @RequestBody User updates) {
+        User user = userRepo.findById(id).orElse(null);
+        if (user == null) {
             return ResponseEntity.notFound().build();
-
-        User user = userOpt.get();
-        if (updates.getName() != null)
+        }
+        if (updates.getName() != null) {
             user.setName(updates.getName());
-        if (updates.getEmail() != null)
+        }
+        if (updates.getEmail() != null) {
             user.setEmail(updates.getEmail());
+        }
         User saved = userRepo.save(user);
         return ResponseEntity.ok(saved);
     }
@@ -67,10 +66,7 @@ public class AdminController {
     // ========== Question Bank ==========
 
     @PostMapping("/questions")
-    public ResponseEntity<Question> addQuestion(@RequestBody Question question) {
-        if (question == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Question> addQuestion(@NonNull @RequestBody Question question) {
         Question saved = questionRepo.save(question);
         return ResponseEntity.ok(saved);
     }

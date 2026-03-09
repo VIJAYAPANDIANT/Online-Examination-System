@@ -6,8 +6,9 @@ import com.exam.proctor.entity.Exam;
 import com.exam.proctor.entity.Question;
 import com.exam.proctor.repository.ExamRepository;
 import com.exam.proctor.repository.QuestionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
+import java.util.Objects;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,21 +18,22 @@ import java.util.Random;
 @Service
 public class ExamPaperService {
 
-    @Autowired
-    private ExamRepository examRepo;
+    private final ExamRepository examRepo;
+    private final QuestionRepository questionRepo;
 
-    @Autowired
-    private QuestionRepository questionRepo;
+    public ExamPaperService(ExamRepository examRepo, QuestionRepository questionRepo) {
+        this.examRepo = examRepo;
+        this.questionRepo = questionRepo;
+    }
 
-    public ExamPaperDTO generatePersonalizedExam(Long examId, String studentId) {
-        Exam exam = examRepo.findById(examId)
+    public ExamPaperDTO generatePersonalizedExam(@NonNull Long examId, @NonNull String studentId) {
+        Exam exam = examRepo.findById(Objects.requireNonNull(examId))
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
 
         List<Question> allQuestions = questionRepo.findAll();
 
         // 1. Shuffle the Questions using the studentId's hashCode as a seed
-        // This ensures the permutation is unique to the student but consistent on page
-        // refresh
+        // This ensures the permutation is unique to the student but consistent on page refresh
         Collections.shuffle(allQuestions, new Random(studentId.hashCode()));
 
         // 2. Convert to DTOs and shuffle the Options within each question

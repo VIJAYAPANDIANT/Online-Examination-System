@@ -9,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
+import java.util.Objects;
 
 import java.security.Principal;
 import java.time.ZoneOffset;
@@ -27,7 +29,7 @@ public class SubmitController {
     private SubmissionProducerService producerService;
 
     @PostMapping("/submit-answer")
-    public ResponseEntity<?> saveProgress(@RequestBody AnswerDTO answer, Principal principal) {
+    public ResponseEntity<?> saveProgress(@NonNull @RequestBody AnswerDTO answer, Principal principal) {
         // Find session using session token or student ID from principal
         String identifier = principal != null ? principal.getName() : answer.getSessionToken();
 
@@ -49,7 +51,8 @@ public class SubmitController {
 
         // Save to Redis first for speed
         String redisKey = "session:" + session.getId() + ":question:" + answer.getQuestionId();
-        redisTemplate.opsForValue().set(redisKey, String.valueOf(answer.getSelectedOption()));
+        String val = String.valueOf(answer.getSelectedOption());
+        redisTemplate.opsForValue().set(redisKey, Objects.requireNonNull((Object) val));
 
         // Send to queue for async database saving
         producerService.queueSubmission(answer);

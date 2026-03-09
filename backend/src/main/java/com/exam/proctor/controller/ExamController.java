@@ -7,6 +7,7 @@ import com.exam.proctor.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,7 +41,7 @@ public class ExamController {
      * Body: { "studentId": 1, "questionId": 5, "selectedOption": "A" }
      */
     @PostMapping("/submit")
-    public ResponseEntity<?> submitAnswer(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> submitAnswer(@NonNull @RequestBody Map<String, Object> body) {
         if (body.get("studentId") == null || body.get("questionId") == null || body.get("selectedOption") == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields: studentId, questionId, or selectedOption"));
         }

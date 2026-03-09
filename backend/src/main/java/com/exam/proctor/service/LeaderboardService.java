@@ -4,20 +4,24 @@ import com.exam.proctor.entity.Submission;
 import com.exam.proctor.entity.User;
 import com.exam.proctor.repository.SubmissionRepository;
 import com.exam.proctor.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Objects;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class LeaderboardService {
 
-    @Autowired
-    private SubmissionRepository submissionRepo;
+    private final SubmissionRepository submissionRepo;
+    private final UserRepository userRepo;
 
-    @Autowired
-    private UserRepository userRepo;
+    public LeaderboardService(SubmissionRepository submissionRepo, UserRepository userRepo) {
+        this.submissionRepo = submissionRepo;
+        this.userRepo = userRepo;
+    }
 
     /**
      * Java Stream-based leaderboard:
@@ -39,11 +43,11 @@ public class LeaderboardService {
                 .limit(10)
                 .map(entry -> {
                     Map<String, Object> row = new LinkedHashMap<>();
-                    row.put("studentId", entry.getKey());
-                    row.put("score", entry.getValue());
+                    row.put("studentId", Objects.requireNonNull(entry.getKey()));
+                    row.put("score", Objects.requireNonNull(entry.getValue()));
 
                     // Attach student name if available
-                    userRepo.findById(entry.getKey()).ifPresent(u -> row.put("name", u.getName()));
+                    userRepo.findById(Objects.requireNonNull(entry.getKey())).ifPresent(u -> row.put("name", u.getName()));
 
                     return row;
                 })

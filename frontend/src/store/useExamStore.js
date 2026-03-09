@@ -5,9 +5,9 @@ const useExamStore = create((set) => ({
   answers: {},
   isNetworkHealthy: true,
   lastSavedAt: null,
-  
+
   setQuestions: (questions) => set({ questions }),
-  
+
   setAnswer: (questionId, selectedOption) => set((state) => ({
     answers: {
       ...state.answers,
@@ -16,7 +16,7 @@ const useExamStore = create((set) => ({
   })),
 
   setNetworkStatus: (status) => set({ isNetworkHealthy: status }),
-  
+
   setLastSaved: () => set({ lastSavedAt: new Date().toISOString() })
 }));
 
