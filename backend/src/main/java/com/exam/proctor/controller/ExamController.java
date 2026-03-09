@@ -41,6 +41,10 @@ public class ExamController {
      */
     @PostMapping("/submit")
     public ResponseEntity<?> submitAnswer(@RequestBody Map<String, Object> body) {
+        if (body.get("studentId") == null || body.get("questionId") == null || body.get("selectedOption") == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields: studentId, questionId, or selectedOption"));
+        }
+
         Long studentId = Long.parseLong(body.get("studentId").toString());
         Long questionId = Long.parseLong(body.get("questionId").toString());
         String selectedOption = body.get("selectedOption").toString();

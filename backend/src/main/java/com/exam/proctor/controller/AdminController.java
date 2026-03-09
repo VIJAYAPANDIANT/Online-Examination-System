@@ -35,13 +35,16 @@ public class AdminController {
     }
 
     @GetMapping("/students/{id}")
-    public ResponseEntity<?> getStudent(@PathVariable Long id) {
+    public ResponseEntity<?> getStudent(@PathVariable long id) {
         Optional<User> user = userRepo.findById(id);
-        return user.isPresent() ? ResponseEntity.ok(user.get()) : ResponseEntity.notFound().build();
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user.get());
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/students/{id}")
-    public ResponseEntity<?> updateStudent(@PathVariable Long id, @RequestBody User updates) {
+    public ResponseEntity<?> updateStudent(@PathVariable long id, @RequestBody User updates) {
         Optional<User> userOpt = userRepo.findById(id);
         if (userOpt.isEmpty())
             return ResponseEntity.notFound().build();
@@ -51,21 +54,25 @@ public class AdminController {
             user.setName(updates.getName());
         if (updates.getEmail() != null)
             user.setEmail(updates.getEmail());
-
-        return ResponseEntity.ok(userRepo.save(user));
+        User saved = userRepo.save(user);
+        return ResponseEntity.ok(saved);
     }
 
     @DeleteMapping("/students/{id}")
-    public ResponseEntity<?> deleteStudent(@PathVariable Long id) {
+    public ResponseEntity<?> deleteStudent(@PathVariable long id) {
         userRepo.deleteById(id);
-        return ResponseEntity.ok(Map.of("message", "Student deleted"));
+        return ResponseEntity.ok().body(Map.of("message", "Student deleted"));
     }
 
     // ========== Question Bank ==========
 
     @PostMapping("/questions")
     public ResponseEntity<Question> addQuestion(@RequestBody Question question) {
-        return ResponseEntity.ok(questionRepo.save(question));
+        if (question == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Question saved = questionRepo.save(question);
+        return ResponseEntity.ok(saved);
     }
 
     @GetMapping("/questions")
