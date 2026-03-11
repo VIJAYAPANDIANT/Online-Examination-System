@@ -327,17 +327,25 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
     <div style={{ minHeight: '100vh', background: '#0f172a', display: 'flex' }}>
       
       {/* Sidebar: Question Navigation */}
-      <div style={{ width: '220px', background: '#1e293b', padding: '20px', borderRight: '1px solid #334155', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '280px', background: '#1e293b', padding: '24px 20px', borderRight: '1px solid #334155', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <h3 style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{topic} Exam</h3>
-        <p style={{ fontSize: '13px', color: '#818cf8', marginBottom: '16px', fontWeight: '600' }}>Score: {score}/{Object.keys(submitted).length}</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+        <p style={{ fontSize: '13px', color: '#818cf8', marginBottom: '16px', fontWeight: '600' }}>Current Score: {score}/{questions.length}</p>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(4, 1fr)', 
+          gap: '10px',
+          maxHeight: '60vh',
+          overflowY: 'auto',
+          paddingRight: '4px'
+        }}>
           {questions.map((_, i) => (
-            <button key={i} onClick={() => { if (submitted[i] === undefined) { setCurrentIndex(i); setSelectedOption(null); setFeedback(null); } }}
+            <button key={i} onClick={() => { setCurrentIndex(i); setSelectedOption(submitted[i] || null); setFeedback(null); }}
               style={{
-                width: '36px', height: '36px', borderRadius: '8px', border: 'none', fontWeight: '600', fontSize: '13px',
-                cursor: submitted[i] !== undefined ? 'default' : 'pointer',
+                width: '100%', aspectRatio: '1/1', borderRadius: '8px', border: 'none', fontWeight: '600', fontSize: '13px',
+                cursor: 'pointer',
                 background: i === currentIndex ? '#6366f1' : submitted[i] !== undefined ? '#22c55e' : '#334155',
-                color: '#fff', transition: 'all 0.2s'
+                color: '#fff', transition: 'all 0.2s',
+                boxShadow: i === currentIndex ? '0 0 12px rgba(99, 102, 241, 0.4)' : 'none'
               }}
             >{i + 1}</button>
           ))}

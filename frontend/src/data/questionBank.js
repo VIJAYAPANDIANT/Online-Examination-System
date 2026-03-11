@@ -316,6 +316,158 @@ const questionBank = {
     { id:48, questionText:"If the side of a square is increased by 25%, then its area is increased by:", optionA:"25%", optionB:"40.5%", optionC:"55%", optionD:"56.25%", correctOption:"D" },
     { id:49, questionText:"Evaluate: (0.1×0.1×0.1 + 0.02×0.02×0.02) / (0.2×0.2×0.2 + 0.04×0.04×0.04)", optionA:"0.125", optionB:"0.250", optionC:"0.500", optionD:"0.625", correctOption:"A" },
     { id:50, questionText:"Which of the following numbers is divisible by 9?", optionA:"123456", optionB:"456789", optionC:"543210", optionD:"589491", correctOption:"D" },
+    { id:51, questionText:"The average of 6 numbers is 40. If one number is removed, the average becomes 38. The removed number is:", optionA:"48", optionB:"50", optionC:"52", optionD:"60", correctOption:"C" },
+
+{ id:52, questionText:"A train running at 72 km/hr crosses a pole in 10 seconds. What is the length of the train?", optionA:"150 m", optionB:"180 m", optionC:"200 m", optionD:"220 m", correctOption:"C" },
+
+{ id:53, questionText:"If the selling price of an article is ₹240 and profit is 20%, the cost price is:", optionA:"₹180", optionB:"₹190", optionC:"₹200", optionD:"₹210", correctOption:"C" },
+
+{ id:54, questionText:"Find the HCF of 36 and 48.", optionA:"6", optionB:"12", optionC:"18", optionD:"24", correctOption:"B" },
+
+{ id:55, questionText:"The sum of two numbers is 72 and their ratio is 5:7. The smaller number is:", optionA:"30", optionB:"32", optionC:"34", optionD:"36", correctOption:"A" },
+
+{ id:56, questionText:"A man can row 15 km downstream in 3 hours. If speed of stream is 2 km/hr, speed in still water is:", optionA:"5 km/hr", optionB:"6 km/hr", optionC:"7 km/hr", optionD:"8 km/hr", correctOption:"C" },
+
+{ id:57, questionText:"Find the next number: 1, 4, 9, 16, 25, ?", optionA:"30", optionB:"36", optionC:"49", optionD:"64", correctOption:"B" },
+
+{ id:58, questionText:"If 12 men can finish a work in 8 days, how many men are needed to finish the work in 6 days?", optionA:"14", optionB:"16", optionC:"18", optionD:"20", correctOption:"B" },
+
+{ id:59, questionText:"The area of a circle with radius 7 cm is:", optionA:"154 cm²", optionB:"144 cm²", optionC:"164 cm²", optionD:"176 cm²", correctOption:"A" },
+
+{ id:60, questionText:"If the marked price of a shirt is ₹800 and discount is 10%, selling price is:", optionA:"₹700", optionB:"₹720", optionC:"₹740", optionD:"₹760", correctOption:"B" },
+
+{ id:61, questionText:"Find the next number in series: 2, 6, 12, 20, ?", optionA:"30", optionB:"28", optionC:"32", optionD:"36", correctOption:"A" },
+
+{ id:62, questionText:"A number increased by 20% becomes 180. The original number is:", optionA:"140", optionB:"150", optionC:"160", optionD:"170", correctOption:"B" },
+
+{ id:63, questionText:"The compound interest on ₹1000 at 10% per annum for 2 years is:", optionA:"₹200", optionB:"₹210", optionC:"₹220", optionD:"₹240", correctOption:"B" },
+
+{ id:64, questionText:"Find the missing number: 3, 6, 18, 72, ?", optionA:"144", optionB:"216", optionC:"288", optionD:"360", correctOption:"D" },
+
+{ id:65, questionText:"If the perimeter of a square is 64 cm, the area is:", optionA:"196", optionB:"225", optionC:"256", optionD:"289", correctOption:"C" },
+
+{ id:66, questionText:"Two numbers are in ratio 4:5 and their sum is 81. The larger number is:", optionA:"36", optionB:"40", optionC:"45", optionD:"50", correctOption:"C" },
+
+{ id:67, questionText:"Find the next number: 8, 27, 64, ?", optionA:"100", optionB:"125", optionC:"216", optionD:"343", correctOption:"B" },
+
+{ id:68, questionText:"A train 150 m long passes a man in 10 seconds. Speed of the train is:", optionA:"36 km/hr", optionB:"40 km/hr", optionC:"45 km/hr", optionD:"54 km/hr", correctOption:"D" },
+
+{ id:69, questionText:"If the simple interest on ₹800 for 3 years is ₹120, the rate of interest is:", optionA:"4%", optionB:"5%", optionC:"6%", optionD:"7%", correctOption:"B" },
+
+{ id:70, questionText:"Find the odd number: 2, 3, 5, 7, 9, 11", optionA:"2", optionB:"5", optionC:"9", optionD:"11", correctOption:"C" },
+
+{ id:71, questionText:"The next number in the sequence 5, 11, 23, 47, ?", optionA:"91", optionB:"95", optionC:"97", optionD:"99", correctOption:"B" },
+
+{ id:72, questionText:"What is 25% of 640?", optionA:"120", optionB:"140", optionC:"160", optionD:"180", correctOption:"C" },
+
+{ id:73, questionText:"If the cost price of 15 articles equals selling price of 12 articles, profit percentage is:", optionA:"20%", optionB:"25%", optionC:"30%", optionD:"35%", correctOption:"B" },
+
+{ id:74, questionText:"Find the missing number: 6, 13, 26, 45, ?", optionA:"70", optionB:"72", optionC:"75", optionD:"80", correctOption:"A" },
+
+{ id:75, questionText:"A sum becomes ₹720 in 2 years at 20% simple interest. The principal is:", optionA:"₹500", optionB:"₹550", optionC:"₹600", optionD:"₹650", correctOption:"C" },
+
+{ id:76, questionText:"How many diagonals does a hexagon have?", optionA:"6", optionB:"7", optionC:"8", optionD:"9", correctOption:"D" },
+
+{ id:77, questionText:"Find the next number: 4, 6, 9, 13, ?", optionA:"16", optionB:"17", optionC:"18", optionD:"19", correctOption:"C" },
+
+{ id:78, questionText:"If 5 men complete a work in 12 days, 10 men will complete it in:", optionA:"5 days", optionB:"6 days", optionC:"7 days", optionD:"8 days", correctOption:"B" },
+
+{ id:79, questionText:"The probability of getting head when a coin is tossed is:", optionA:"1/4", optionB:"1/2", optionC:"1/3", optionD:"2/3", correctOption:"B" },
+
+{ id:80, questionText:"If the length of rectangle is doubled and breadth same, area becomes:", optionA:"Double", optionB:"Triple", optionC:"Same", optionD:"Half", correctOption:"A" },
+
+{ id:81, questionText:"Find the next number: 1, 8, 27, 64, ?", optionA:"81", optionB:"100", optionC:"125", optionD:"144", correctOption:"C" },
+
+{ id:82, questionText:"Speed of a car is 60 km/hr. Distance covered in 2.5 hours is:", optionA:"120 km", optionB:"140 km", optionC:"150 km", optionD:"160 km", correctOption:"C" },
+
+{ id:83, questionText:"The LCM of 8, 12, and 16 is:", optionA:"24", optionB:"36", optionC:"48", optionD:"72", correctOption:"C" },
+
+{ id:84, questionText:"Find the next number: 3, 7, 15, 31, ?", optionA:"47", optionB:"63", optionC:"62", optionD:"64", correctOption:"B" },
+
+{ id:85, questionText:"A person earns ₹500 per day. His earnings in 30 days are:", optionA:"₹12000", optionB:"₹13000", optionC:"₹15000", optionD:"₹16000", correctOption:"C" },
+
+{ id:86, questionText:"If the side of cube is 5 cm, volume is:", optionA:"100", optionB:"125", optionC:"150", optionD:"200", correctOption:"B" },
+
+{ id:87, questionText:"The square root of 256 is:", optionA:"12", optionB:"14", optionC:"16", optionD:"18", correctOption:"C" },
+
+{ id:88, questionText:"Find the missing number: 2, 10, 30, 68, ?", optionA:"120", optionB:"130", optionC:"140", optionD:"150", correctOption:"B" },
+
+{ id:89, questionText:"If a number is increased by 25%, the new number is 125. Original number is:", optionA:"90", optionB:"95", optionC:"100", optionD:"105", correctOption:"C" },
+
+{ id:90, questionText:"Find the odd number: 16, 25, 36, 49, 60", optionA:"25", optionB:"36", optionC:"49", optionD:"60", correctOption:"D" },
+
+{ id:91, questionText:"The perimeter of rectangle with length 10 and breadth 6 is:", optionA:"30", optionB:"32", optionC:"34", optionD:"36", correctOption:"B" },
+
+{ id:92, questionText:"If 8x = 96, value of x is:", optionA:"10", optionB:"11", optionC:"12", optionD:"13", correctOption:"C" },
+
+{ id:93, questionText:"Find next number: 11, 13, 17, 19, ?", optionA:"21", optionB:"23", optionC:"25", optionD:"27", correctOption:"B" },
+
+{ id:94, questionText:"Area of triangle = 1/2 × base × height. If base=10 and height=6, area is:", optionA:"20", optionB:"25", optionC:"30", optionD:"35", correctOption:"C" },
+
+{ id:95, questionText:"If a shopkeeper gains 25% on selling price ₹500, cost price is:", optionA:"₹375", optionB:"₹400", optionC:"₹420", optionD:"₹450", correctOption:"B" },
+
+{ id:96, questionText:"Find next number: 2, 4, 7, 11, 16, ?", optionA:"20", optionB:"22", optionC:"23", optionD:"25", correctOption:"B" },
+
+{ id:97, questionText:"How many degrees in a straight line?", optionA:"90", optionB:"120", optionC:"180", optionD:"360", correctOption:"C" },
+
+{ id:98, questionText:"The cube root of 729 is:", optionA:"7", optionB:"8", optionC:"9", optionD:"10", correctOption:"C" },
+
+{ id:99, questionText:"Find the next number: 10, 20, 40, 80, ?", optionA:"120", optionB:"140", optionC:"160", optionD:"180", correctOption:"C" },
+
+{ id:100, questionText:"If the radius of circle is doubled, area becomes:", optionA:"2 times", optionB:"3 times", optionC:"4 times", optionD:"8 times", correctOption:"C" }
+  ],
+
+  DSA: [
+    { id:1, questionText:"What is the time complexity of searching for an element in a sorted array using Binary Search?", optionA:"O(n)", optionB:"O(log n)", optionC:"O(n log n)", optionD:"O(1)", correctOption:"B" },
+    { id:2, questionText:"Which data structure uses the LIFO (Last In First Out) principle?", optionA:"Queue", optionB:"Linked List", optionC:"Stack", optionD:"Tree", correctOption:"C" },
+    { id:3, questionText:"In a row-major order 2D array, how is the address of an element A[i][j] calculated?", optionA:"Base + [i * columns + j] * size", optionB:"Base + [j * rows + i] * size", optionC:"Base + [i + j] * size", optionD:"Base + [i * j] * size", correctOption:"A" },
+    { id:4, questionText:"Which of the following is an advantage of a Linked List over an Array?", optionA:"Random access of elements", optionB:"Lower memory overhead", optionC:"Dynamic size", optionD:"Better cache locality", correctOption:"C" },
+    { id:5, questionText:"Which of the following applications uses a Stack?", optionA:"Resource allocation in OS", optionB:"Reversing a string", optionC:"Breadth-First Search (BFS)", optionD:"Serving requests on a single shared resource", correctOption:"B" },
+    { id:6, questionText:"What is the term for adding an element to a full stack?", optionA:"Underflow", optionB:"Overflow", optionC:"Pushing", optionD:"Popping", correctOption:"B" },
+    { id:7, questionText:"A circular queue is implemented using an array of size N. If 'front' is the index of the first element and 'rear' is the index of the last, what is the condition for a full queue?", optionA:"(rear + 1) % N == front", optionB:"rear == front", optionC:"rear + 1 == N", optionD:"front == 0", correctOption:"A" },
+    { id:8, questionText:"In a Doubly Linked List, what does each node contain?", optionA:"Data and a next pointer", optionB:"Data and a previous pointer", optionC:"Data, a next pointer, and a previous pointer", optionD:"Data and a head pointer", correctOption:"C" },
+    { id:9, questionText:"What is the maximum number of nodes in a binary tree of height K (where the root is at height 1)?", optionA:"2^K", optionB:"2^(K-1)", optionC:"2^K - 1", optionD:"2K", correctOption:"C" },
+    { id:10, questionText:"In which tree traversal method is the root visited last?", optionA:"Pre-order", optionB:"In-order", optionC:"Post-order", optionD:"Level-order", correctOption:"C" },
+    { id:11, questionText:"What is an AVL tree?", optionA:"A tree where every node has exactly two children", optionB:"A self-balancing binary search tree", optionC:"A tree used for heap sort", optionD:"A tree with no root", correctOption:"B" },
+    { id:12, questionText:"Which traversal of a Binary Search Tree (BST) produces a sorted sequence of elements?", optionA:"Pre-order", optionB:"Post-order", optionC:"In-order", optionD:"Level-order", correctOption:"C" },
+    { id:13, questionText:"Which sorting algorithm is considered the fastest for general-purpose use (average case)?", optionA:"Bubble Sort", optionB:"Selection Sort", optionC:"Quick Sort", optionD:"Insertion Sort", correctOption:"C" },
+    { id:14, questionText:"What is the worst-case time complexity of Merge Sort?", optionA:"O(n^2)", optionB:"O(n log n)", optionC:"O(n)", optionD:"O(log n)", correctOption:"B" },
+    { id:15, questionText:"Which sorting algorithm is \"stable\" (maintains the relative order of equal elements)?", optionA:"Quick Sort", optionB:"Heap Sort", optionC:"Merge Sort", optionD:"Selection Sort", correctOption:"C" },
+    { id:16, questionText:"How many comparisons are needed in the worst case for Bubble Sort on N elements?", optionA:"N", optionB:"N log N", optionC:"N(N-1)/2", optionD:"N^2/4", correctOption:"C" },
+    { id:17, questionText:"Which data structure is used to implement Breadth-First Search (BFS)?", optionA:"Stack", optionB:"Queue", optionC:"Tree", optionD:"Linked List", correctOption:"B" },
+    { id:18, questionText:"Which algorithm is used to find the shortest path from a single source to all other vertices?", optionA:"Prim's Algorithm", optionB:"Kruskal's Algorithm", optionC:"Dijkstra's Algorithm", optionD:"Huffman Coding", correctOption:"C" },
+    { id:19, questionText:"A graph with V vertices and E edges is represented using an Adjacency Matrix. What is the space complexity?", optionA:"O(V+E)", optionB:"O(E^2)", optionC:"O(V^2)", optionD:"O(V * E)", correctOption:"C" },
+    { id:20, questionText:"What is a Minimum Spanning Tree (MST)?", optionA:"A tree that connects all vertices with the maximum edge weight", optionB:"A subset of edges that connects all vertices without cycles and with minimum total weight", optionC:"A graph with the minimum number of vertices", optionD:"The path with the fewest edges between two nodes", correctOption:"B" },
+    { id:21, questionText:"What is \"Collision\" in Hashing?", optionA:"When two different keys produce the same hash value", optionB:"When the hash table is full", optionC:"When the hash function returns a null value", optionD:"When the memory is corrupted", correctOption:"A" },
+    { id:22, questionText:"In a Max-Heap, where is the largest element located?", optionA:"At a leaf node", optionB:"At the root", optionC:"In the middle of the tree", optionD:"It can be anywhere", correctOption:"B" },
+    { id:23, questionText:"Which of the following is NOT a technique for collision resolution?", optionA:"Chaining", optionB:"Open Addressing", optionC:"Double Hashing", optionD:"Binary Search", correctOption:"D" },
+    { id:24, questionText:"What is the time complexity to insert an element into a Binary Heap of n elements?", optionA:"O(1)", optionB:"O(n)", optionC:"O(log n)", optionD:"O(n log n)", correctOption:"C" },
+    { id:25, questionText:"Which of the following is true about a Red-Black Tree?", optionA:"It is a type of B-Tree.", optionB:"The root is always red.", optionC:"Every leaf (NIL) is black.", optionD:"It is not a binary search tree.", correctOption:"C" },
+    { id:26, questionText:"In a B-Tree of order m, what is the maximum number of children a node can have?", optionA:"m-1", optionB:"m", optionC:"m/2", optionD:"2m", correctOption:"B" },
+    { id:27, questionText:"A Min-Heap is represented as an array. If an element is at index i, what is the index of its left child?", optionA:"2i", optionB:"2i + 1", optionC:"i/2", optionD:"2i - 1", correctOption:"B" },
+    { id:28, questionText:"Which approach does the Fractional Knapsack problem follow?", optionA:"Dynamic Programming", optionB:"Greedy Method", optionC:"Backtracking", optionD:"Divide and Conquer", correctOption:"B" },
+    { id:29, questionText:"What is the main characteristic of Dynamic Programming?", optionA:"It uses random numbers.", optionB:"It solves subproblems and stores their results (memoization).", optionC:"It always picks the local optimum.", optionD:"It is a recursive-only approach.", correctOption:"B" },
+    { id:30, questionText:"Which algorithm is used to solve the All-Pairs Shortest Path problem?", optionA:"Dijkstra’s Algorithm", optionB:"Bellman-Ford Algorithm", optionC:"Floyd-Warshall Algorithm", optionD:"Prim's Algorithm", correctOption:"C" },
+    { id:31, questionText:"Huffman Coding is used for:", optionA:"Sorting data", optionB:"Data compression", optionC:"Searching in a graph", optionD:"Database indexing", correctOption:"B" },
+    { id:32, questionText:"Which sorting algorithm has the best worst-case time complexity?", optionA:"Bubble Sort", optionB:"Quick Sort", optionC:"Merge Sort", optionD:"Selection Sort", correctOption:"C" },
+    { id:33, questionText:"What is the space complexity of an in-place sorting algorithm?", optionA:"O(1)", optionB:"O(n)", optionC:"O(log n)", optionD:"O(n^2)", correctOption:"A" },
+    { id:34, questionText:"In a hash table, 'Open Addressing' refers to:", optionA:"Creating a linked list at each index.", optionB:"Finding another open slot in the table when a collision occurs.", optionC:"Resizing the table.", optionD:"Using a better hash function.", correctOption:"B" },
+    { id:35, questionText:"The KMP (Knuth-Morris-Pratt) algorithm is used for:", optionA:"Sorting numbers", optionB:"Pattern matching in strings", optionC:"Finding the shortest path", optionD:"Memory management", correctOption:"B" },
+    { id:36, questionText:"A graph is 'Connected' if:", optionA:"It has no cycles.", optionB:"There is a path between every pair of vertices.", optionC:"Every vertex has the same degree.", optionD:"It is a complete graph.", correctOption:"B" },
+    { id:37, questionText:"Which algorithm is used to find the topological sort of a Directed Acyclic Graph (DAG)?", optionA:"BFS", optionB:"DFS-based ordering", optionC:"Kruskal's", optionD:"Binary Search", correctOption:"B" },
+    { id:38, questionText:"What is the time complexity of Kruskal’s Algorithm for a graph with V vertices and E edges?", optionA:"O(E log E) or O(E log V)", optionB:"O(V^2)", optionC:"O(E+V)", optionD:"O(1)", correctOption:"A" },
+    { id:39, questionText:"Which data structure is most suitable for implementing a Priority Queue?", optionA:"Linked List", optionB:"Array", optionC:"Heap", optionD:"Stack", correctOption:"C" },
+    { id:40, questionText:"What is a 'Splay Tree'?", optionA:"A heap-based tree.", optionB:"A self-adjusting binary search tree where recently accessed elements are moved to the root.", optionC:"A tree used only for string storage.", optionD:"A perfectly balanced tree.", correctOption:"B" },
+    { id:41, questionText:"The 'Tower of Hanoi' puzzle is best solved using:", optionA:"Iteration", optionB:"Recursion", optionC:"Hashing", optionD:"Queue", correctOption:"B" },
+    { id:42, questionText:"What is the time complexity of adding a node at the beginning of a Singly Linked List?", optionA:"O(1)", optionB:"O(n)", optionC:"O(log n)", optionD:"O(n^2)", correctOption:"A" },
+    { id:43, questionText:"Which data structure is used in the implementation of the 'Undo' feature in text editors?", optionA:"Queue", optionB:"Stack", optionC:"Hash Table", optionD:"Graph", correctOption:"B" },
+    { id:44, questionText:"Which sorting algorithm is most efficient for a small number of elements or nearly sorted data?", optionA:"Quick Sort", optionB:"Merge Sort", optionC:"Insertion Sort", optionD:"Heap Sort", correctOption:"C" },
+    { id:45, questionText:"What is the time complexity of the 'delete' operation in a Binary Search Tree (worst case)?", optionA:"O(1)", optionB:"O(log n)", optionC:"O(n)", optionD:"O(n log n)", correctOption:"C" },
+    { id:46, questionText:"What is a 'Trie' data structure primarily used for?", optionA:"Storing integers", optionB:"Fast retrieval of strings/prefixes", optionC:"Sorting floating-point numbers", optionD:"Balancing a network", correctOption:"B" },
+    { id:47, questionText:"In Graph theory, what is 'In-degree'?", optionA:"Number of edges leaving a vertex.", optionB:"Number of edges entering a vertex.", optionC:"The total number of vertices.", optionD:"The length of the longest path.", correctOption:"B" },
+    { id:48, questionText:"Which searching algorithm works by repeatedly dividing the search interval in half?", optionA:"Linear Search", optionB:"Binary Search", optionC:"Jump Search", optionD:"Exponential Search", correctOption:"B" },
+    { id:49, questionText:"What is the load factor of a hash table?", optionA:"Number of buckets / Number of elements", optionB:"Number of elements / Number of buckets", optionC:"Max capacity - current size", optionD:"Total size of keys", correctOption:"B" },
+    { id:50, questionText:"Which data structure is required to check for balanced parentheses in an expression?", optionA:"Queue", optionB:"Stack", optionC:"Binary Tree", optionD:"Array", correctOption:"B" },
   ],
 
   PUZZLE: [

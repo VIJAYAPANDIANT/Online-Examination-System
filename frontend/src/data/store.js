@@ -1,13 +1,14 @@
 import questionBank from './questionBank.js';
 
 const STATIC_TOPICS = [
+  { key: 'APTITUDE', label: 'Aptitude', icon: '🧠', color: '#ec4899', desc: '100 MCQs on Arithmetic, Logic, Probability & DI' },
+  { key: 'DSA', label: 'DSA', icon: '🌳', color: '#6366f1', desc: '50 MCQs on Arrays, LL, Trees, Graphs & Algorithms' },
+  { key: 'PUZZLE', label: 'Puzzles', icon: '🧩', color: '#f43f5e', desc: '10 MCQs on Logic, Math, and Brain Teasers' },
   { key: 'CN', label: 'Computer Networks', icon: '🌐', color: '#3b82f6', desc: '50 MCQs on OSI, TCP/IP, Routing & Security' },
   { key: 'OS', label: 'Operating Systems', icon: '💻', color: '#10b981', desc: '50 MCQs on Process, Memory, Deadlocks & I/O' },
+  { key: 'SQL', label: 'SQL', icon: '🗄️', color: '#ef4444', desc: '50 MCQs on Joins, Normalization, ACID & Triggers' },
   { key: 'JAVA', label: 'Java', icon: '☕', color: '#f59e0b', desc: '50 MCQs on OOP, Collections, Spring & JDBC' },
   { key: 'PYTHON', label: 'Python', icon: '🐍', color: '#8b5cf6', desc: '50 MCQs on Basics, OOP, Flask, Pandas & More' },
-  { key: 'SQL', label: 'SQL', icon: '🗄️', color: '#ef4444', desc: '50 MCQs on Joins, Normalization, ACID & Triggers' },
-  { key: 'APTITUDE', label: 'Aptitude', icon: '🧠', color: '#ec4899', desc: '50 MCQs on Arithmetic, Logic, Probability & DI' },
-  { key: 'PUZZLE', label: 'Puzzles', icon: '🧩', color: '#f43f5e', desc: '10 MCQs on Logic, Math, and Brain Teasers' },
 ];
 
 const STORAGE_KEYS = {

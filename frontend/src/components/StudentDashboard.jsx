@@ -22,7 +22,7 @@ const StudentDashboard = ({ user, onSelect, onLogout }) => {
           <span style={{ fontSize: '32px' }}>🐛</span>
           <div>
             <h1 style={{ fontSize: '20px', fontWeight: '900', background: 'linear-gradient(135deg, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.5px', margin: 0 }}>BUG</h1>
-            <p style={{ color: '#64748b', fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', margin: 0 }}>Portal</p>
+            <p style={{ color: '#64748b', fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', margin: 0 }}>Exam Portal</p>
           </div>
         </div>
 

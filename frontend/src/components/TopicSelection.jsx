@@ -16,7 +16,7 @@ const TopicSelection = ({ user, onSelect, onLogout, hideHeader = false }) => {
             <span style={{ fontSize: '32px' }}>🐛</span>
             <div>
               <h1 style={{ fontSize: '28px', fontWeight: '900', background: 'linear-gradient(135deg, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.5px' }}>BUG</h1>
-              <p style={{ color: '#64748b', fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase' }}>Examination Platform</p>
+              <p style={{ color: '#64748b', fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase' }}>Exam Platform</p>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -36,7 +36,7 @@ const TopicSelection = ({ user, onSelect, onLogout, hideHeader = false }) => {
       {/* Welcome Banner */}
       <div style={{ maxWidth: '950px', margin: '0 auto 36px', padding: '28px 32px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.15)' }}>
         <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#e2e8f0', marginBottom: '6px' }}>Welcome back, {user?.name} 👋</h2>
-        <p style={{ color: '#94a3b8', fontSize: '15px' }}>Choose a topic below to start your 50-question MCQ exam. Good luck! 🍀</p>
+        <p style={{ color: '#94a3b8', fontSize: '15px' }}>Choose a topic below to start your MCQ exam. Good luck! 🍀</p>
       </div>
 
       {/* Topic Cards Grid */}
@@ -67,7 +67,7 @@ const TopicSelection = ({ user, onSelect, onLogout, hideHeader = false }) => {
 
       {/* Footer */}
       <div style={{ textAlign: 'center', marginTop: '48px', color: '#475569', fontSize: '13px' }}>
-        <p>🐛 BUG Examination Platform — 310 Real MCQs Across 7 Topics</p>
+        <p>🐛 BUG Examination Platform — 410 Real MCQs Across 8 Topics</p>
       </div>
     </div>
   );
