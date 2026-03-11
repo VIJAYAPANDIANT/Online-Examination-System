@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import TopicSelection from './TopicSelection.jsx';
+import Compiler from './Compiler.jsx';
+import { useState } from 'react';
 
 const StudentDashboard = ({ user, onSelect, onLogout }) => {
   const [activeTab, setActiveTab] = useState('tasks');
@@ -38,6 +39,19 @@ const StudentDashboard = ({ user, onSelect, onLogout }) => {
             }}
           >
             <span style={{ fontSize: '20px' }}>📋</span> My Tasks
+          </button>
+          
+          <button 
+            onClick={() => setActiveTab('compiler')}
+            style={{
+              padding: '14px 18px', borderRadius: '12px', border: 'none', textAlign: 'left',
+              background: activeTab === 'compiler' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+              color: activeTab === 'compiler' ? '#818cf8' : '#94a3b8',
+              fontSize: '15px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s',
+              display: 'flex', alignItems: 'center', gap: '12px'
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>💻</span> Compiler
           </button>
           
           <button 
@@ -80,6 +94,8 @@ const StudentDashboard = ({ user, onSelect, onLogout }) => {
             <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
             <TopicSelection user={user} onSelect={onSelect} hideHeader={true} />
           </div>
+        ) : activeTab === 'compiler' ? (
+          <Compiler />
         ) : (
           <div style={{ maxWidth: '1000px', margin: '0 auto', animation: 'fadeIn 0.4s ease-out' }}>
             <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>Global Leaderboard</h2>
