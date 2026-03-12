@@ -25,20 +25,15 @@ const AdminDashboard = ({ user, onLogout }) => {
 
   const fetchData = async () => {
     try {
-      const res1 = await axios.get('/api/admin/results');
+      const res1 = await axios.get('http://localhost:8080/api/admin/students');
       setStudents(res1.data);
-      const res2 = await axios.get('/api/admin/leaderboard');
-      setLeaderboard(res2.data);
+      const res2 = await axios.get('http://localhost:8080/api/admin/leaderboard');
+      const formattedLb = res2.data.map(item => ({ ...item, id: item.studentId }));
+      setLeaderboard(formattedLb);
     } catch {
-      // Mock data
-      setStudents([
-        { studentId: 1, name: 'John', email: 'john@test.com', score: 8, totalAttempted: 10 },
-        { studentId: 2, name: 'Alice', email: 'alice@test.com', score: 9, totalAttempted: 10 },
-      ]);
-      setLeaderboard([
-        { studentId: 2, name: 'Alice', score: 9 },
-        { studentId: 1, name: 'John', score: 8 },
-      ]);
+      console.warn('Backend unreachable. Falling back to local storage.');
+      setStudents(JSON.parse(localStorage.getItem('exam_users') || '[]'));
+      setLeaderboard(JSON.parse(localStorage.getItem('leaderboard') || '[]'));
     }
   };
 
@@ -100,15 +95,13 @@ const AdminDashboard = ({ user, onLogout }) => {
         {tab === 'stats' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             {(() => {
-              const allRegistered = JSON.parse(localStorage.getItem('exam_users') || '[]');
               const activeTests = Object.keys(localStorage).filter(k => k.startsWith('active_exam_user_')).length;
-              const totalScores = JSON.parse(localStorage.getItem('leaderboard') || '[]').length;
               
               return (
                 <>
                   <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', padding: '30px', borderRadius: '20px', border: '1px solid #334155' }}>
                     <p style={{ color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase', marginBottom: '8px' }}>Registered Students</p>
-                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#818cf8', margin: 0 }}>{allRegistered.length + 2}</p>
+                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#818cf8', margin: 0 }}>{students.length}</p>
                     <p style={{ color: '#475569', fontSize: '12px', marginTop: '4px' }}>Including demo accounts</p>
                   </div>
                   <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', padding: '30px', borderRadius: '20px', border: '1px solid #334155' }}>
@@ -118,7 +111,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                   </div>
                   <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', padding: '30px', borderRadius: '20px', border: '1px solid #334155' }}>
                     <p style={{ color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase', marginBottom: '8px' }}>Tests Completed</p>
-                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#f59e0b', margin: 0 }}>{totalScores}</p>
+                    <p style={{ fontSize: '42px', fontWeight: '900', color: '#f59e0b', margin: 0 }}>{leaderboard.length}</p>
                   </div>
                 </>
               );
@@ -140,11 +133,11 @@ const AdminDashboard = ({ user, onLogout }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...JSON.parse(localStorage.getItem('exam_users') || '[]')].map(s => (
+                  {students.map(s => (
                     <tr key={s.id} style={{ borderBottom: '1px solid #1e293b' }}>
                       <td style={{ padding: '14px', fontWeight: '600', color: '#e2e8f0' }}>{s.name}</td>
                       <td style={{ padding: '14px', color: '#94a3b8' }}>{s.email}</td>
-                      <td style={{ padding: '14px', fontSize: '12px' }}><span style={{ padding: '2px 8px', borderRadius: '4px', background: '#0f172a', color: '#818cf8' }}>{s.role}</span></td>
+                      <td style={{ padding: '14px', fontSize: '12px' }}><span style={{ padding: '2px 8px', borderRadius: '4px', background: '#0f172a', color: '#818cf8' }}>{s.role || 'STUDENT'}</span></td>
                       <td style={{ padding: '14px' }}>
                         {localStorage.getItem('active_exam_user_' + s.id) ? 
                           <span style={{ color: '#10b981', fontSize: '12px' }}>● Taking {localStorage.getItem('active_exam_user_' + s.id)}</span> : 
@@ -203,8 +196,7 @@ const AdminDashboard = ({ user, onLogout }) => {
           <div style={{ background: '#1e293b', borderRadius: '16px', padding: '24px', border: '1px solid #334155' }}>
             <h2 style={{ fontSize: '18px', marginBottom: '20px', color: '#e2e8f0' }}>🏆 Overall Cumulative Leaderboard</h2>
             {(() => {
-              const lb = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-              return lb.sort((a,b) => b.score - a.score).map((entry, i) => (
+              return [...leaderboard].sort((a,b) => b.score - a.score).map((entry, i) => (
                 <div key={entry.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderRadius: '10px', marginBottom: '8px', background: '#0f172a' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <span style={{ fontSize: '20px', fontWeight: '800', width: '30px', color: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#cd7f32' : '#64748b' }}>
@@ -212,7 +204,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                     </span>
                     <div>
                       <span style={{ fontWeight: '600', color: '#e2e8f0' }}>{entry.name}</span>
-                      <div style={{ fontSize: '11px', color: '#64748b' }}>Best scores: {entry.topicScores ? Object.keys(entry.topicScores).length : 0} topics</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>Best scores: {entry.topicScores ? Object.keys(entry.topicScores).length : (entry.score > 0 ? 'Multiple' : 0)} topics</div>
                     </div>
                   </div>
                   <span style={{ fontWeight: '700', fontSize: '18px', color: '#818cf8' }}>{entry.score}</span>

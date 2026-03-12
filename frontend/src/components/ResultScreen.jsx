@@ -6,15 +6,31 @@ const ResultScreen = ({ user, onBack, onLogout }) => {
   const [tab, setTab] = useState('score');
 
   useEffect(() => {
-    // Read results from localStorage
+    // Read user's own current exam results from localStorage
     const examResults = JSON.parse(localStorage.getItem('examResults_' + user.id) || '[]');
     const correct = examResults.filter(r => r.isCorrect).length;
     setResults({ totalQuestions: examResults.length, correctAnswers: correct, score: correct });
 
-    // Read leaderboard from localStorage
-    const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-    scores.sort((a, b) => b.score - a.score);
-    setLeaderboard(scores);
+    // Fetch Global Leaderboard
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/admin/leaderboard');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        
+        // Map backend studentId to id
+        const formattedData = data.map(item => ({ ...item, id: item.studentId }));
+        const sorted = formattedData.sort((a, b) => b.score - a.score);
+        setLeaderboard(sorted);
+      } catch (err) {
+        console.warn('Backend leaderboard unreachable. Falling back to local storage.');
+        const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+        scores.sort((a, b) => b.score - a.score);
+        setLeaderboard(scores);
+      }
+    };
+
+    fetchLeaderboard();
   }, [user]);
 
   return (

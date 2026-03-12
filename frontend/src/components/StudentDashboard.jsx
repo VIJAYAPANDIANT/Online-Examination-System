@@ -1,15 +1,42 @@
 import TopicSelection from './TopicSelection.jsx';
 import Compiler from './Compiler.jsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const StudentDashboard = ({ user, onSelect, onLogout }) => {
   const [activeTab, setActiveTab] = useState('tasks');
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [myRank, setMyRank] = useState(null);
+  const [myData, setMyData] = useState(null);
 
-  // Load leaderboard and calculate ranks
-  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-  const sortedLeaderboard = [...leaderboard].sort((a, b) => b.score - a.score);
-  const myRank = sortedLeaderboard.findIndex(s => String(s.id) === String(user.id)) + 1;
-  const myData = sortedLeaderboard.find(s => String(s.id) === String(user.id));
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/admin/leaderboard');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        
+        // Map backend properties to frontend expectation
+        const formattedData = data.map(item => ({
+          ...item,
+          id: item.studentId
+        }));
+        
+        const sorted = formattedData.sort((a, b) => b.score - a.score);
+        setLeaderboard(sorted);
+        setMyRank(sorted.findIndex(s => String(s.id) === String(user.id)) + 1 || null);
+        setMyData(sorted.find(s => String(s.id) === String(user.id)) || null);
+      } catch (err) {
+        console.warn('Backend leaderboard unreachable. Falling back to local storage.');
+        const localLb = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+        const sortedLb = [...localLb].sort((a, b) => b.score - a.score);
+        setLeaderboard(sortedLb);
+        setMyRank(sortedLb.findIndex(s => String(s.id) === String(user.id)) + 1 || null);
+        setMyData(sortedLb.find(s => String(s.id) === String(user.id)) || null);
+      }
+    };
+    
+    fetchLeaderboard();
+  }, [user.id]);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0f172a', color: '#e2e8f0', fontFamily: 'Inter, sans-serif' }}>
@@ -131,7 +158,7 @@ const StudentDashboard = ({ user, onSelect, onLogout }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedLeaderboard.map((entry, i) => (
+                  {leaderboard.map((entry, i) => (
                     <tr key={entry.id} style={{ 
                       borderBottom: '1px solid #334155',
                       background: String(entry.id) === String(user.id) ? 'rgba(99, 102, 241, 0.05)' : 'transparent',

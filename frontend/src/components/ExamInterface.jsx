@@ -39,7 +39,7 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
 
   const allAnswered = questions.length > 0 && Object.keys(submitted).length === questions.length;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedOption) return;
     const q = questions[currentIndex];
     const isCorrect = q.correctOption === selectedOption;
@@ -48,7 +48,20 @@ const ExamInterface = ({ user, topic, onComplete, onExit }) => {
     setSubmitted(prev => ({ ...prev, [currentIndex]: selectedOption }));
     if (isCorrect) setScore(prev => prev + 1);
 
-    // Skip backend submission, results are already handled via localStorage during handleFinish
+    // Persist submission to backend database for global leaderboard
+    try {
+      await fetch('http://localhost:8080/api/exam/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: user.id,
+          questionId: q.id || currentIndex,
+          selectedOption: selectedOption
+        })
+      });
+    } catch (err) {
+      console.warn('Backend unreachable. Handled via localStorage offline fallback.');
+    }
 
     // Auto-move to next unanswered question after 1.2 seconds (but don't finish exam)
     setTimeout(() => {

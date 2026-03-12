@@ -8,7 +8,9 @@ const LoginPage = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState('');
 
-  // ── Helpers: read/write registered users from localStorage ──────────
+  // ── Helpers: read/write session data ──────────
+  const API_BASE_URL = 'http://localhost:8080/api/auth';
+
   const getStoredUsers = () => {
     try { return JSON.parse(localStorage.getItem('exam_users') || '[]'); }
     catch { return []; }
@@ -19,12 +21,6 @@ const LoginPage = ({ onLogin }) => {
     users.push(user);
     localStorage.setItem('exam_users', JSON.stringify(users));
   };
-
-  // Built-in demo accounts (always available)
-  const DEMO_USERS = [
-    { id: 1, name: 'Demo Student', email: 'demo@exam.com',     password: 'demo',     role: 'STUDENT' },
-    { id: 2, name: 'Student One',  email: 'student1@exam.com', password: 'student1', role: 'STUDENT' },
-  ];
 
   // ── Notification: Send email to admin using EmailJS ──────────────────
   const notifyAdmin = (userAction, userData) => {
@@ -51,7 +47,7 @@ const LoginPage = ({ onLogin }) => {
       .catch((err) => console.error('Failed to notify admin:', err));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -72,52 +68,104 @@ const LoginPage = ({ onLogin }) => {
       localStorage.setItem('active_session_id', sessionId);
     };
 
-    // ── Admin bypass ───────────────────────────────────────────────────
+    // ── Admin bypass (Local override for first-time setup or emergency) ──
     const ADMIN_EMAIL = 'vijayapandian112007@gmail.com';
     if (!isRegister && email.toLowerCase() === ADMIN_EMAIL && password === '1234567890') {
       const adminUser = { id: 0, name: 'Vijayapandian (Admin)', email: ADMIN_EMAIL, role: 'ADMIN' };
-      notifyAdmin('Admin Login', adminUser);
+      notifyAdmin('Admin Login (Local Bypass)', adminUser);
       recordSession(adminUser);
       onLogin(adminUser);
       return;
     }
 
-    if (isRegister) {
-      // ── Register ──────────────────────────────────────────────────
-      if (!name.trim())     { setError('Name is required');     return; }
-      if (!email.trim())    { setError('Email is required');    return; }
-      if (!password.trim()) { setError('Password is required'); return; }
-      if (password.length < 4) { setError('Password must be at least 4 characters'); return; }
+    const handleLocalAuth = () => {
+      if (isRegister) {
+        if (!name.trim())     { setError('Name is required');     return; }
+        if (!email.trim())    { setError('Email is required');    return; }
+        if (!password.trim()) { setError('Password is required'); return; }
+        if (password.length < 4) { setError('Password must be at least 4 characters'); return; }
 
-      const allUsers = [...DEMO_USERS, ...getStoredUsers()];
-      if (allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-        setError('Email already registered. Please login.');
-        return;
+        const allUsers = getStoredUsers();
+        if (allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+          setError('Email already registered. Please login.');
+          return;
+        }
+
+        const role = email.toLowerCase() === ADMIN_EMAIL ? 'ADMIN' : 'STUDENT';
+        const newUser = { id: Date.now(), name: name.trim(), email: email.trim().toLowerCase(), password, role };
+        saveUser(newUser);
+        const { password: _p, ...safeUser } = newUser;
+        notifyAdmin('New Account Registration (Offline)', safeUser);
+        recordSession(safeUser);
+        onLogin(safeUser);
+      } else {
+        const allUsers = getStoredUsers();
+        const found = allUsers.find(
+          u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+        );
+        if (found) {
+          const { password: _p, ...safeUser } = found;
+          notifyAdmin('User Login (Offline)', safeUser);
+          recordSession(safeUser);
+          onLogin(safeUser);
+          return;
+        }
+        setError('Invalid email or password');
+      }
+    };
+
+    try {
+      const endpoint = isRegister ? 'register' : 'login';
+      const cleanEmail = email.trim().toLowerCase();
+      const body = isRegister 
+        ? { name: name.trim(), email: cleanEmail, password }
+        : { email: cleanEmail, password };
+
+      let response;
+      try {
+        response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      } catch (networkError) {
+        console.warn('Backend unreachable. Falling back to local storage.');
+        return handleLocalAuth();
       }
 
-      // If registered email is the admin email, assign ADMIN role, otherwise STUDENT
-      const role = email.toLowerCase() === ADMIN_EMAIL ? 'ADMIN' : 'STUDENT';
-      const newUser = { id: Date.now(), name: name.trim(), email: email.trim().toLowerCase(), password, role };
-      saveUser(newUser);
-      const { password: _p, ...safeUser } = newUser;
-      notifyAdmin('New Account Registration', safeUser);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // If the backend doesn't recognize the user, check if they registered while offline
+        if (!isRegister && response.status === 401) {
+          const allUsers = getStoredUsers();
+          const found = allUsers.find(u => u.email.toLowerCase() === cleanEmail && u.password === password);
+          if (found) {
+            console.warn('Backend login failed, but user found in local storage. Logging in locally.');
+            const { password: _p, ...safeUser } = found;
+            notifyAdmin('User Login (Offline DB Match)', safeUser);
+            recordSession(safeUser);
+            onLogin(safeUser);
+            return;
+          }
+        }
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      // Backend returns safe user data (no password)
+      const safeUser = data;
+      
+      // If the registered/logged in email is the admin email, ensure role is ADMIN
+      if (safeUser.email.toLowerCase() === ADMIN_EMAIL) {
+        safeUser.role = 'ADMIN';
+      }
+
+      notifyAdmin(isRegister ? 'New Account Registration' : 'User Login', safeUser);
       recordSession(safeUser);
       onLogin(safeUser);
 
-    } else {
-      // ── Login ─────────────────────────────────────────────────────
-      const allUsers = [...DEMO_USERS, ...getStoredUsers()];
-      const found = allUsers.find(
-        u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-      );
-      if (found) {
-        const { password: _p, ...safeUser } = found;
-        notifyAdmin('User Login', safeUser);
-        recordSession(safeUser);
-        onLogin(safeUser);
-        return;
-      }
-      setError('Invalid email or password');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -208,9 +256,9 @@ const LoginPage = ({ onLogin }) => {
         <div style={{ marginTop: '20px', padding: '12px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.06)', border: '1px solid rgba(99, 102, 241, 0.1)', textAlign: 'center' }}>
           <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '2px' }}>Admin Access</p>
           <p style={{ fontSize: '11px', color: '#818cf8', fontWeight: '600', marginBottom: '8px' }}>vijayapandian112007@gmail.com</p>
-          <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '2px' }}>Student Access</p>
-          <p style={{ fontSize: '11px', color: '#34d399', fontWeight: '600', marginBottom: '2px' }}>demo@exam.com / demo</p>
-          <p style={{ fontSize: '11px', color: '#64748b' }}>Register your own account to start testing</p>
+          <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '2px' }}>User Access</p>
+          <p style={{ fontSize: '11px', color: '#818cf8', fontWeight: '600', marginBottom: '8px' }}>user@gmail.com</p>
+          <p style={{ fontSize: '11px', color: '#34d399', fontWeight: '600', marginBottom: '2px' }}>Register your own account to start testing</p>
         </div>
       </div>
     </div>
