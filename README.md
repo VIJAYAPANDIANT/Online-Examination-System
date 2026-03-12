@@ -73,7 +73,7 @@ Online Examination System/
 │   └── Dockerfile
 ├── docker-compose.yml  # Full stack orchestration
 ├── nginx.conf          # Nginx configuration
-└── PROJECT_DESCRIPTION.md
+└── README.md
 ```
 
 ---
