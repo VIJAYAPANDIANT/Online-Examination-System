@@ -6,7 +6,7 @@
 
 The **Online Examination System** is a cutting-edge, full-stack platform designed to revolutionize the way academic and professional assessments are conducted. In an era of remote learning, maintaining the integrity of examinations is paramount. This system bridges the gap between convenience and security by integrating advanced **AI Proctoring** capabilities with a seamless user experience.
 
-Key objectives of this platform:
+### Key objectives of this platform:
 - **Integrity First:** Using real-time monitoring to prevent common cheating methods like tab switching and unauthorized external Hilfe.
 - **Scalability:** Built on a robust backend architecture (Spring Boot + RabbitMQ) to ensure that hundreds of students can submitleur exams simultaneously without lag.
 - **Versatility:** Not just for multiple-choice questions; the integrated multi-language compiler allows for real-time coding assessments.
